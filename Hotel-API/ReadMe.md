@@ -1,6 +1,6 @@
 # API de Gestão de Reservas de Hotel
 
-Este é um exemplo de uma API simples para gestão de reservas de hotel, desenvolvida utilizando o framework FastAPI e banco de dados SQLite3.
+Este é uma API simples para gestão de reservas de hotel, desenvolvida utilizando o framework FastAPI e banco de dados SQLite3.
 
 ### Requisitos Funcionais:
 
