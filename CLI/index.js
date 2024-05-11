@@ -4,6 +4,7 @@ import inquirer from 'inquirer'
 import chalkAnimation from 'chalk-animation'
 import { createSpinner } from 'nanospinner'
 
+const http = require('http')
 const clientData = {}
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)) // timer 2s
@@ -81,7 +82,6 @@ async function handleAge(age) {
     * In which currency should this transaction be processed? (if applicable)
     * When should this transaction be processed? (current date/time, future date/time, etc.)
     * Do you confirm your request to proceed with this transaction?
-
 
 */
 
