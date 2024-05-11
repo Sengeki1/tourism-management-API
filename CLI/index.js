@@ -4,7 +4,7 @@ import inquirer from 'inquirer'
 import chalkAnimation from 'chalk-animation'
 import { createSpinner } from 'nanospinner'
 
-let client 
+const clientData = {}
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)) // timer 2s
 
@@ -17,7 +17,19 @@ async function welcome() {
     pulseTitle.stop() // kill animation
 }
 
-await welcome()
+async function chooseTransaction() {
+    const choice = await inquirer.prompt({
+        name: 'transaction',
+        type: 'list',
+        message: 'Choose the wanted transaction',
+        choices: [
+            'Hotel', 
+            'Flight Company'
+        ],
+    })
+
+    clientData.transaction = choice.transaction
+}
 
 async function askName() {
     const answers = await inquirer.prompt({
@@ -29,10 +41,8 @@ async function askName() {
         }
     })
 
-    client = answers.client_name
+    clientData.name = answers.client_name
 }
-
-await askName()
 
 async function askAge() {
     const answers = await inquirer.prompt({
@@ -54,23 +64,32 @@ async function handleAge(age) {
 
     if (!(Number.isNaN(int))) {
         spinner.success({text: `...`})
+        clientData.age = int
     } else {
         spinner.error({text: `The following age is not acceptable, retry again!`})
+        askAge()
     }
 }
 
+//  TO-DO (Ask for transaction questions then save the answers in obj)
+/*
+
+    * What type of transaction are you initiating? (e.g., purchase, withdrawal, transfer)
+    * What is the monetary amount or quantity associated with this transaction?
+    * Who is the recipient or beneficiary of this transaction? (e.g., account number, recipient's name)
+    * Can you provide a brief description or reason for this transaction? (optional)
+    * In which currency should this transaction be processed? (if applicable)
+    * When should this transaction be processed? (current date/time, future date/time, etc.)
+    * Do you confirm your request to proceed with this transaction?
+
+
+*/
+
+await welcome()
+await chooseTransaction()
+await askName()
 await askAge()
 
-async function chooseTransaction() {
-    const choice = await inquirer.prompt({
-        name: 'transaction',
-        type: 'list',
-        message: 'Choose the wanted transaction',
-        choices: [
-            'Hotel', 
-            'Flight Company'
-        ],
-    })
-}
+console.log(clientData)
 
-await chooseTransaction()
+// TO-DO (send a http POST request to the Monitor TP server containing the obj)
