@@ -38,7 +38,7 @@ if (clientData.reservationChoice === "Hotel") {
         const options = {
             host: "127.0.0.1",
             port: "3001",
-            path: "/reservateHotel",
+            path: "/reservatehotel",
             method: "GET",
             headers: {
                 'Content-Type': 'application/json'

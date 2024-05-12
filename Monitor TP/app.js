@@ -140,7 +140,7 @@ app.post('/transaction', (req, res) => {
     post_req.end()
 })
 
-app.get('/reservateHotel', (req, res) => {
+app.get('/reservatehotel', (req, res) => {
     const options = {
         host: "0.0.0.0",
         port: "8000",

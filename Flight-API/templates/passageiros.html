@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Passageiros</title>
+</head>
+<body>
+    <h1>Lista de Passageiros</h1>
+    <ul>
+        {% for passageiro in passageiros %}
+        <li>ID: {{ passageiro['id'] }}, Nome: {{ passageiro['nome'] }}, Sobrenome: {{ passageiro['sobrenome'] }}, Email: {{ passageiro['email'] }}, Telefone: {{ passageiro['telefone'] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

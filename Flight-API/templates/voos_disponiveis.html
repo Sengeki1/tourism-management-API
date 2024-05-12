@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voos Disponíveis</title>
+</head>
+<body>
+    <h1>Voos Disponíveis</h1>
+    <ul>
+        {% for voo in voos %}
+        <li>ID: {{ voo['id'] }}, Origem: {{ voo['origem'] }}, Destino: {{ voo['destino'] }}, Data: {{ voo['data'] }}, Hora de Partida: {{ voo['hora_partida'] }}, Vagas: {{ voo['vagas'] }}</li>
+        {% endfor %}
+    </ul>
+</body>
+</html>
