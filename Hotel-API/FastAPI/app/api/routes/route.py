@@ -1,12 +1,12 @@
-# Endpoint para criar uma nova reserva
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from app.api.models.model import Reserva
 from app.database.session import conectar_bd
 
 app = FastAPI()
+router = APIRouter()
 
-# Endpoint para criar reserva
-@app.post("/reservas/")
+# Endpoint para criar uma nova reserva
+@router.post("/reservas/")
 async def criar_reserva(reserva: Reserva):
     conn = conectar_bd()
     cursor = conn.cursor()
@@ -23,7 +23,7 @@ async def criar_reserva(reserva: Reserva):
 
 
 # Endpoint para obter todas as reservas
-@app.get("/reservas/")
+@router.get("/reservas/")
 async def obter_reservas():
     conn = conectar_bd()
     cursor = conn.cursor()

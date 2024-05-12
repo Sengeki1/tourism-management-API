@@ -9,4 +9,4 @@ class Reserva(BaseModel):
     numero_quarto: str
     check_in: int
     check_out: int
-    status: str
+    status: str = "ativa"
