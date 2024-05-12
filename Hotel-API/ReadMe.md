@@ -1,6 +1,6 @@
 # API de Gestão de Reservas de Hotel
 
-Este é um exemplo de uma API simples para gestão de reservas de hotel, desenvolvida utilizando o framework FastAPI e banco de dados SQLite3.
+Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o framework FastAPI e banco de dados SQLite3.
 
 ### Requisitos Funcionais:
 
@@ -41,10 +41,10 @@ Espero que isso ajude!
 
 ## Uso
 
-1. Execute o servidor:
+1. Execute o servidor(dentro do diretorio FastAPI):
 
     ```bash
-    uvicorn main:app --reload
+    uvicorn run:app --reload
     ```
 
 2. Acesse a documentação da API em seu navegador:
@@ -107,3 +107,9 @@ Exemplo de resposta:
     }
   ]
 }
+```
+### To Do
+
+- [ ] Cancelar reserva pelo ID;
+- [x] Criar Base de Dados;
+- [ ] Definir uma quantidade limitada de quartos e categorias;
