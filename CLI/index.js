@@ -29,7 +29,7 @@ async function chooseTransaction() {
         ],
     })
 
-    clientData.transaction = choice.transaction
+    clientData.transactionChoice = choice.transaction
 }
 
 async function askName() {
