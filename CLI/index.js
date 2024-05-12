@@ -2,10 +2,9 @@
 
 import inquirer from 'inquirer'
 import chalkAnimation from 'chalk-animation'
-import { createSpinner } from 'nanospinner'
 import http from 'http'
 
-const clientData = {}
+const clientData = {card: {}}
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)) // timer 2s
 
@@ -18,80 +17,213 @@ async function welcome() {
     pulseTitle.stop() // kill animation
 }
 
-async function chooseTransaction() {
+async function chooseReservation() {
     const choice = await inquirer.prompt({
-        name: 'transaction',
+        name: 'reservation',
         type: 'list',
-        message: 'Choose the wanted transaction',
+        message: 'Choose the wanted reservation:',
         choices: [
             'Hotel', 
             'Flight Company'
         ],
     })
 
-    clientData.transactionChoice = choice.transaction
+    clientData.reservationChoice = choice.reservation
+}
+await chooseReservation()
+
+if (clientData.reservationChoice === "Hotel") {
+
+    async function hotelGet() {
+        const options = {
+            host: "127.0.0.1",
+            port: "3001",
+            path: "/reservateHotel",
+            method: "GET",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+        const get_req = http.request(options, (res)=> {
+            console.log(`\nStatus code: ${res.statusCode}`)
+        
+            const data = ''
+            res.on('data', chunk => {
+                data += chunk
+            })
+            res.on('end', () => {
+                console.log(`Available Reservations: ${data}`)
+            })
+        })
+        get_req.on('error', (error) => {
+            console.error(`\nError making HTTP request to the server: ${error.message}`)
+        })
+        get_req.end()
+    }
+
+    async function clientName() {
+        const answers = await inquirer.prompt({
+            name: 'client_name',
+            type: 'input',
+            message: 'Enter your Name:',
+            default() {
+                return 'Name'
+            }
+        })
+    
+        clientData.name = answers.client_name
+    }
+
+    async function clientEmail() {
+        const answers = await inquirer.prompt({
+            name: 'client_email',
+            type: 'input',
+            message: 'Enter your Email:',
+            default() {
+                return 'Email'
+            }
+        })
+    
+        clientData.email = answers.client_email
+    }
+
+    async function clientPhone() {
+        const answers = await inquirer.prompt({
+            name: 'client_phone',
+            type: 'input',
+            message: 'Enter your Phone Number:',
+            default() {
+                return 'Number'
+            }
+        })
+    
+        clientData.phone_number = answers.client_phone
+    }
+
+    async function roomType() {
+        const answers = await inquirer.prompt({
+            name: 'room_type',
+            type: 'list',
+            message: 'Choose a Room type:',
+            choices: [
+                "Standard Duplo",
+                "Suíte Presidencial"
+            ]
+        })
+    
+        clientData.room_type = answers.room_type
+    }
+
+    // Room Number implementation
+    // Check_in implementation
+    // Check_out implementation
+    // Status implementation
+
+    await hotelGet()
+    await clientName()
+    await clientEmail()
+    await clientPhone()
+    await roomType()
 }
 
-async function askName() {
+async function typeCard() {
     const answers = await inquirer.prompt({
-        name: 'client_name',
+        name: 'card_type',
+        type: 'list',
+        message: 'Enter your credit card type:',
+        choices: [
+            'Visa',
+            'Mastercard'
+        ]
+    })
+
+    clientData.card.type = answers.card_type
+}
+
+async function cardName() {
+    const answers = await inquirer.prompt({
+        name: 'card_name',
         type: 'input',
-        message: 'What is your name?',
+        message: 'Enter your credit card holder name:',
         default() {
-            return 'Client'
+            return 'Card Name'
         }
     })
 
-    clientData.name = answers.client_name
+    clientData.card.name = answers.card_name
 }
 
-async function askAge() {
+async function cardNumber() {
     const answers = await inquirer.prompt({
-        name: 'client_age',
+        name: 'card_number',
         type: 'input',
-        message: 'How old are you?',
+        message: 'Enter your credit card number:',
         default() {
-            return 'Client'
+            return 'Card Number'
         }
     })
 
-    return handleAge(answers.client_age)
+    clientData.card.number = answers.card_number
 }
 
-async function handleAge(age) {
-    const int = parseInt(age)
-    const spinner = createSpinner('Validating input...').start()
-    await sleep()
+async function cardDate() {
+    const answers = await inquirer.prompt({
+        name: 'card_date',
+        type: 'input',
+        message: 'Enter your credit card expire date (MM/AA):',
+        default() {
+            return 'Expire Date'
+        }
+    })
 
-    if (!(Number.isNaN(int))) {
-        spinner.success({text: `...`})
-        clientData.age = int
-    } else {
-        spinner.error({text: `The following age is not acceptable, retry again!`})
-        askAge()
+    clientData.card.date = answers.card_date
+}
+
+async function securityCode() {
+    const answers = await inquirer.prompt({
+        name: 'card_security_code',
+        type: 'input',
+        message: 'Enter your credit card security code:',
+        default() {
+            return 'Security Code'
+        }
+    })
+
+    clientData.card.security = answers.card_security_code
+}
+
+await welcome()
+await typeCard()
+await cardName()
+await cardNumber()
+await cardDate()
+await securityCode()
+
+const postData = `${JSON.stringify(clientData)}`
+
+const options = {
+    host: "127.0.0.1",
+    port: "3001",
+    path: "/transaction",
+    method: "POST",
+    headers: {
+        'Content-Type': 'application/json'
     }
 }
 
-//  TO-DO (Ask for transaction questions then save the answers in obj)
-/*
+const post_req = http.request(options, (res) => {
+    console.log(`Status code: ${res.statusCode}`)
 
-    * What type of transaction are you initiating? (e.g., purchase, withdrawal, transfer)
-    * What is the monetary amount or quantity associated with this transaction?
-    * Who is the recipient or beneficiary of this transaction? (e.g., account number, recipient's name)
-    * Can you provide a brief description or reason for this transaction? (optional)
-    * In which currency should this transaction be processed? (if applicable)
-    * When should this transaction be processed? (current date/time, future date/time, etc.)
-    * Do you confirm your request to proceed with this transaction?
-
-*/
-
-await welcome()
-await chooseTransaction()
-await askName()
-await askAge()
-
-console.log(clientData)
-
-// TO-DO (send a http POST request to the Monitor TP server containing the obj)
-
-// TO-DO (get http STATUS CODE from the Monitor TP server)
+    var responseData = ""
+    res.on('data', (chunk) => {
+        responseData += chunk
+    })
+    res.on('end', () => {
+        console.log(responseData)
+    })
+})
+post_req.on('error', (error) => {
+    console.log(`Error making request: ${error.message}`);
+})
+post_req.write(postData)
+post_req.end()
