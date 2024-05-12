@@ -65,10 +65,7 @@ if (clientData.reservationChoice === "Hotel") {
         const answers = await inquirer.prompt({
             name: 'client_name',
             type: 'input',
-            message: 'Enter your Name:',
-            default() {
-                return 'Name'
-            }
+            message: 'Enter your Name:'
         })
     
         clientData.name = answers.client_name
@@ -78,10 +75,7 @@ if (clientData.reservationChoice === "Hotel") {
         const answers = await inquirer.prompt({
             name: 'client_email',
             type: 'input',
-            message: 'Enter your Email:',
-            default() {
-                return 'Email'
-            }
+            message: 'Enter your Email:'
         })
     
         clientData.email = answers.client_email
@@ -91,10 +85,7 @@ if (clientData.reservationChoice === "Hotel") {
         const answers = await inquirer.prompt({
             name: 'client_phone',
             type: 'input',
-            message: 'Enter your Phone Number:',
-            default() {
-                return 'Number'
-            }
+            message: 'Enter your Phone Number:'
         })
     
         clientData.phone_number = answers.client_phone
@@ -149,10 +140,7 @@ async function cardName() {
     const answers = await inquirer.prompt({
         name: 'card_name',
         type: 'input',
-        message: 'Enter your credit card holder name:',
-        default() {
-            return 'Card Name'
-        }
+        message: 'Enter your credit card holder name:'
     })
 
     clientData.card.name = answers.card_name
@@ -162,10 +150,7 @@ async function cardNumber() {
     const answers = await inquirer.prompt({
         name: 'card_number',
         type: 'input',
-        message: 'Enter your credit card number:',
-        default() {
-            return 'Card Number'
-        }
+        message: 'Enter your credit card number:'
     })
 
     clientData.card.number = answers.card_number
@@ -175,10 +160,7 @@ async function cardDate() {
     const answers = await inquirer.prompt({
         name: 'card_date',
         type: 'input',
-        message: 'Enter your credit card expire date (MM/AA):',
-        default() {
-            return 'Expire Date'
-        }
+        message: 'Enter your credit card expire date (MM/AA):'
     })
 
     clientData.card.date = answers.card_date
@@ -188,10 +170,7 @@ async function securityCode() {
     const answers = await inquirer.prompt({
         name: 'card_security_code',
         type: 'input',
-        message: 'Enter your credit card security code:',
-        default() {
-            return 'Security Code'
-        }
+        message: 'Enter your credit card security code:'
     })
 
     clientData.card.security = answers.card_security_code

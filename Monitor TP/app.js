@@ -15,7 +15,7 @@ app.post('/transaction', (req, res) => {
     Object.keys(req.body).forEach(key => {
         if (typeof req.body[key] === "string" && req.body[key].trim() === "") {
             res.statusCode = 406
-            return res.send("error: missing fields")
+            return res.send("missing fields")
         }
         if (key === "name") {
             var hasNumber = /\d/
@@ -108,8 +108,8 @@ app.post('/transaction', (req, res) => {
                 status: req.body.status
             }`
             options = {
-                host: "127.0.0.1",
-                port: "3000",
+                host: "0.0.0.0",
+                port: "8000",
                 path: "/reservas/",
                 method: "POST",
                 headers: {
@@ -125,9 +125,12 @@ app.post('/transaction', (req, res) => {
     const post_req = http.request(options, (response) => {
         console.log(`Status code: ${res.statusCode}`)
 
+        var responseData = ''
         response.on('data', (data) => { // listen on data
-            console.log(`Response from DataBase: ${data}`)
-            res.status(200).send(data) // Successful Status Code to Client
+            responseData += data
+        })
+        response.on('end', () => {
+            res.send(responseData)
         })
     })
     post_req.on('error', (error) => { // in case of an error
@@ -139,20 +142,22 @@ app.post('/transaction', (req, res) => {
 
 app.get('/reservateHotel', (req, res) => {
     const options = {
-        host: "127.0.0.1",
-        port: "3000",
+        host: "0.0.0.0",
+        port: "8000",
         path: "/reservas/",
         method: "GET",
     }
 
     // get a HTTP GET request from Database Server 
     const get_req = http.request(options, (response) => {
-        let responseData = ''
+        console.log(`\nStatus code: ${res.statusCode}`)
+
+        var responseData = ''
         response.on('data', (chunk) => { // collect the data from the response
             responseData += chunk
         })
         response.on('end', () => { // when the entire response has been received
-            res.status(200).json(JSON.parse(responseData))
+            //res.send(responseData)
         })
     })
     get_req.on('error', (error) => {
