@@ -3,8 +3,8 @@
 import inquirer from 'inquirer'
 import chalkAnimation from 'chalk-animation'
 import { createSpinner } from 'nanospinner'
+import http from 'http'
 
-const http = require('http')
 const clientData = {}
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)) // timer 2s
@@ -93,3 +93,5 @@ await askAge()
 console.log(clientData)
 
 // TO-DO (send a http POST request to the Monitor TP server containing the obj)
+
+// TO-DO (get http STATUS CODE from the Monitor TP server)
