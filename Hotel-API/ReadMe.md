@@ -107,7 +107,7 @@ Exemplo de resposta:
     }
   ]
 }
-
+```
 ### To Do
 
 - [ ] Cancelar reserva pelo ID;
