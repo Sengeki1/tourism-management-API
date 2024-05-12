@@ -5,6 +5,7 @@ from app.database.session import conectar_bd
 
 app = FastAPI()
 
+# Endpoint para criar reserva
 @app.post("/reservas/")
 async def criar_reserva(reserva: Reserva):
     conn = conectar_bd()
