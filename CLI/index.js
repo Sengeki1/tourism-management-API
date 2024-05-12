@@ -114,10 +114,13 @@ if (clientData.reservationChoice === "Hotel") {
         clientData.room_type = answers.room_type
     }
 
-    // Room Number implementation
-    // Check_in implementation
-    // Check_out implementation
-    // Status implementation
+    // TO-DO
+    /* 
+        * Room Number implementation
+        * Check_in implementation
+        * Check_out implementation
+        * Status implementation
+    */
 
     await hotelGet()
     await clientName()
@@ -125,6 +128,8 @@ if (clientData.reservationChoice === "Hotel") {
     await clientPhone()
     await roomType()
 }
+
+// Flight question TO-DO
 
 async function typeCard() {
     const answers = await inquirer.prompt({

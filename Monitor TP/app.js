@@ -9,12 +9,6 @@ const app = express()
 
 app.use(bodyParser.json())
 
-function countingDigits(num) {
-    return parseInt(String(num).split('').reduce(
-        (count, digit) => count + 1, 0
-    ))
-}
-
 app.post('/transaction', (req, res) => {
     console.log(req.body)
 
