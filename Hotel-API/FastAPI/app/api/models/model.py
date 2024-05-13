@@ -6,7 +6,6 @@ class Reserva(BaseModel):
     email_cliente: str
     telefone_cliente: str
     tipo_quarto: str
-    numero_quarto: str
     check_in: int
     check_out: int
     status: str = "ativa"
