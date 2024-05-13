@@ -11,7 +11,6 @@ def verificar_tabela_reservas():
             email_cliente TEXT,
             telefone_cliente TEXT,
             tipo_quarto TEXT,
-            numero_quarto TEXT,
             check_in INTEGER,
             check_out INTEGER,
             status TEXT
