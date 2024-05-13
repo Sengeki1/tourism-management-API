@@ -66,11 +66,10 @@ Exemplo:
   "nome_cliente": "João da Silva",
   "email_cliente": "joao@example.com",
   "telefone_cliente": "(+238) 999-9999",
-  "tipo_quarto": "Standard Duplo",
-  "numero_quarto": "101",
+  "tipo_quarto": "A",
   "check_in": 1620648000,  // Timestamp para 10 de maio de 2021, 12:00:00
   "check_out": 1621104000, // Timestamp para 16 de maio de 2021, 12:00:00
-  "status": "confirmada"
+  "status": "ativa"
 }
 ```
 
@@ -88,19 +87,17 @@ Exemplo de resposta:
       "nome_cliente": "João da Silva",
       "email_cliente": "joao@example.com",
       "telefone_cliente": "(+238) 999-9999",
-      "tipo_quarto": "Standard Duplo",
-      "numero_quarto": "101",
+      "tipo_quarto": "B",
       "check_in": 1620648000,
       "check_out": 1621104000,
-      "status": "confirmada"
+      "status": "activa"
     },
     {
       "id": 2,
       "nome_cliente": "Maria Oliveira",
       "email_cliente": "maria@example.com",
       "telefone_cliente": "(+238) 999-9999",
-      "tipo_quarto": "Suíte Presidencial",
-      "numero_quarto": "201",
+      "tipo_quarto": "C",
       "check_in": 1622552400,
       "check_out": 1623330000,
       "status": "pendente"
@@ -110,6 +107,6 @@ Exemplo de resposta:
 ```
 ### To Do
 
-- [ ] Cancelar reserva pelo ID;
+- [x] Cancelar reserva pelo ID;
 - [x] Criar Base de Dados;
-- [ ] Definir uma quantidade limitada de quartos e categorias;
+- [x] Definir uma quantidade limitada de quartos e categorias;
