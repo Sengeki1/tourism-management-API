@@ -102,7 +102,8 @@ app.post('/transaction', (req, res) => {
                 nome_cliente: req.body.name,
                 email_client: req.body.email,
                 telefone_cliente: req.body.phone,
-                tipo_quarto: req.body.room,
+                tipo_quarto: req.body.room_type,
+                numero_quarto: req.body.room
                 check_in: req.body.check_in,
                 check_out: req.body.check_out,
                 status: req.body.status
@@ -123,9 +124,9 @@ app.post('/transaction', (req, res) => {
 
     // send HTTP POST request to Database Server
     const post_req = http.request(options, (response) => {
-        console.log(`Status code: ${res.statusCode}`)
+        console.log(`Status code: ${response.statusCode}`)
 
-        var responseData = ''
+        let responseData = ''
         response.on('data', (data) => { // listen on data
             responseData += data
         })
@@ -140,24 +141,20 @@ app.post('/transaction', (req, res) => {
     post_req.end()
 })
 
-app.get('/reservatehotel', (req, res) => {
+app.get('/reservateroom', (req, res) => {
     const options = {
         host: "0.0.0.0",
         port: "8000",
-        path: "/reservas/",
+        path: "/quartos-disponiveis/",
         method: "GET",
     }
 
     // get a HTTP GET request from Database Server 
     const get_req = http.request(options, (response) => {
-        console.log(`\nStatus code: ${res.statusCode}`)
+        console.log(`\nStatus code: ${response.statusCode}`)
 
-        var responseData = ''
-        response.on('data', (chunk) => { // collect the data from the response
-            responseData += chunk
-        })
-        response.on('end', () => { // when the entire response has been received
-            //res.send(responseData)
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
         })
     })
     get_req.on('error', (error) => {

@@ -2,6 +2,7 @@
 
 import inquirer from 'inquirer'
 import chalkAnimation from 'chalk-animation'
+import { createSpinner } from 'nanospinner'
 import http from 'http'
 
 const clientData = {card: {}}
@@ -34,31 +35,55 @@ await chooseReservation()
 
 if (clientData.reservationChoice === "Hotel") {
 
-    async function hotelGet() {
-        const options = {
-            host: "127.0.0.1",
-            port: "3001",
-            path: "/reservatehotel",
-            method: "GET",
-            headers: {
-                'Content-Type': 'application/json'
+    async function chooseRoom() {
+        const answers = await inquirer.prompt({
+            name: 'room',
+            type: 'list',
+            message: 'Choose Room Type:',
+            choices: [
+                "Classe A",
+                "Classe B",
+                "Classe C"
+            ]
+        })
+
+        clientData.room = answers.room
+    }
+
+    async function getRoom() {
+        let available_rooms = '';
+
+        return new Promise((resolve, reject) => {
+            const options = {
+                host: "127.0.0.1",
+                port: "3001",
+                path: "/reservateroom",
+                method: "GET",
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             }
-        }
-        const get_req = http.request(options, (res)=> {
-            console.log(`\nStatus code: ${res.statusCode}`)
-        
-            const data = ''
-            res.on('data', chunk => {
-                data += chunk
+            const get_req = http.request(options, (res)=> {
+                //console.log(`\nStatus code: ${res.statusCode}`)
+                
+                res.on('data', chunk => {
+                    available_rooms += chunk
+                })
+                res.on('end', () => {
+                    const jsonData = JSON.parse(available_rooms);
+                    Object.keys(jsonData["Quartos disponíveis"]).forEach(key => {
+                        const value = jsonData["Quartos disponíveis"][key]
+                        console.log(`Available  Rooms: ${key}: ${value}`)
+                    })
+                    resolve()
+                })
             })
-            res.on('end', () => {
-                console.log(`Available Reservations: ${data}`)
+            get_req.on('error', (error) => {
+                console.log(`\nError making HTTP request to the server: ${error.message}`)
+                reject(error)
             })
+            get_req.end()
         })
-        get_req.on('error', (error) => {
-            console.error(`\nError making HTTP request to the server: ${error.message}`)
-        })
-        get_req.end()
     }
 
     async function clientName() {
@@ -105,15 +130,21 @@ if (clientData.reservationChoice === "Hotel") {
         clientData.room_type = answers.room_type
     }
 
+    // TO-DO 
+    /*
+        * Operation Choose Delete Reservation
+        * Make Reservation
+    */
+
     // TO-DO
     /* 
-        * Room Number implementation
         * Check_in implementation
         * Check_out implementation
         * Status implementation
     */
 
-    await hotelGet()
+    await getRoom()
+    await chooseRoom()
     await clientName()
     await clientEmail()
     await clientPhone()
@@ -195,15 +226,12 @@ const options = {
     }
 }
 
+let responseData = ""
 const post_req = http.request(options, (res) => {
-    console.log(`Status code: ${res.statusCode}`)
-
-    var responseData = ""
+    //console.log(`Status code: ${res.statusCode}`)
+    
     res.on('data', (chunk) => {
         responseData += chunk
-    })
-    res.on('end', () => {
-        console.log(responseData)
     })
 })
 post_req.on('error', (error) => {
@@ -211,3 +239,14 @@ post_req.on('error', (error) => {
 })
 post_req.write(postData)
 post_req.end()
+
+async function final() {
+    const spinner = createSpinner("...").start()
+    await sleep()
+    if (responseData === "Reserva feita com sucesso!") {
+        spinner.success({text: responseData})
+    } else {
+        spinner.error({text: responseData})
+    }
+}
+await final()
