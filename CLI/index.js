@@ -70,7 +70,7 @@ if (clientData.reservationChoice === "Hotel") {
                     available_rooms += chunk
                 })
                 res.on('end', () => {
-                    const jsonData = JSON.parse(available_rooms);
+                    const jsonData = JSON.parse(available_rooms)
                     Object.keys(jsonData["Quartos disponíveis"]).forEach(key => {
                         const value = jsonData["Quartos disponíveis"][key]
                         console.log(`Available  Rooms: ${key}: ${value}`)
@@ -84,6 +84,30 @@ if (clientData.reservationChoice === "Hotel") {
             })
             get_req.end()
         })
+    }
+
+    async function getCheck_in() {
+        let today = new Date()
+
+        let dd = today.getDate()
+        let mm = today.getMonth() + 1
+        let yyyy = today.getFullYear()
+
+        let day = `${dd}${mm}${yyyy}`
+
+        clientData.check_in = parseInt(day)
+    }
+
+    async function getCheck_out() {
+        let today = new Date()
+
+        let dd = today.getDate() + 5
+        let mm = today.getMonth() + 6
+        let yyyy = today.getFullYear()
+
+        let day = `${dd}${mm}${yyyy}`
+
+        clientData.check_out = parseInt(day)
     }
 
     async function clientName() {
@@ -138,20 +162,53 @@ if (clientData.reservationChoice === "Hotel") {
 
     // TO-DO
     /* 
-        * Check_in implementation
-        * Check_out implementation
         * Status implementation
     */
 
     await getRoom()
     await chooseRoom()
+    await getCheck_in()
+    await getCheck_out()
     await clientName()
     await clientEmail()
     await clientPhone()
     await roomType()
-}
 
-// Flight question TO-DO
+} else { // Flight
+    async function clientName() {
+        const answers = await inquirer.prompt({
+            name: 'client_name',
+            type: 'input',
+            message: 'Enter your Name:'
+        })
+    
+        clientData.name = answers.client_name
+    }
+
+    async function clientEmail() {
+        const answers = await inquirer.prompt({
+            name: 'client_email',
+            type: 'input',
+            message: 'Enter your Email:'
+        })
+    
+        clientData.email = answers.client_email
+    }
+
+    async function clientPhone() {
+        const answers = await inquirer.prompt({
+            name: 'client_phone',
+            type: 'input',
+            message: 'Enter your Phone Number:'
+        })
+    
+        clientData.phone_number = answers.client_phone
+    }
+
+    await clientName()
+    await clientEmail()
+    await clientPhone()
+}
 
 async function typeCard() {
     const answers = await inquirer.prompt({
@@ -227,11 +284,20 @@ const options = {
 }
 
 let responseData = ""
+let mensagem
 const post_req = http.request(options, (res) => {
     //console.log(`Status code: ${res.statusCode}`)
     
     res.on('data', (chunk) => {
         responseData += chunk
+    })
+    res.on('end', () => {
+        const jsonData = JSON.parse(responseData)
+        Object.keys(jsonData["mensagem"]).forEach(key => {
+            mensagem = jsonData["mensagem"][key]
+            console.log(mensagem)
+            console.log(typeof mensagem)
+        })
     })
 })
 post_req.on('error', (error) => {
@@ -243,10 +309,10 @@ post_req.end()
 async function final() {
     const spinner = createSpinner("...").start()
     await sleep()
-    if (responseData === "Reserva feita com sucesso!") {
-        spinner.success({text: responseData})
+    if (mensagem === "Reserva feita com sucesso!") {
+        spinner.success({text: mensagem})
     } else {
-        spinner.error({text: responseData})
+        spinner.error({text: mensagem})
     }
 }
 await final()

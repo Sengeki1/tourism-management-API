@@ -1,6 +1,7 @@
 const express = require('express')
 const valid = require('card-validator')
 const http = require('http')
+const axios = require('axios')
 var validator = require('email-validator')
 const {phone} = require('phone')
 const bodyParser = require('body-parser')
@@ -101,7 +102,7 @@ app.post('/transaction', (req, res) => {
             post_data = `{
                 nome_cliente: req.body.name,
                 email_client: req.body.email,
-                telefone_cliente: req.body.phone,
+                telefone_cliente: req.body.phone_number,
                 tipo_quarto: req.body.room_type,
                 numero_quarto: req.body.room
                 check_in: req.body.check_in,
@@ -117,28 +118,48 @@ app.post('/transaction', (req, res) => {
                     'Content-Type': 'application/json' 
                 }
             }
-        } else {
-            // Flight header options
+
+            // send HTTP POST request to Hotel Database Server
+            const post_req = http.request(options, (response) => {
+                console.log(`Status code: ${response.statusCode}`)
+
+                let responseData = ''
+                response.on('data', (data) => { // listen on data
+                    responseData += data
+                })
+                response.on('end', () => {
+                    res.send(responseData)
+                })
+            })
+            post_req.on('error', (error) => { // in case of an error
+                console.log(`Error sending request: ${error.message}`)
+            })
+            post_req.write(post_data)
+            post_req.end()
+
+        } else if (key === "reservationChoice" && req.body[key] != "Hotel") {
+            let profile = req.body.name.split(" ")
+            post_data = {
+                nome: profile[0],
+                sobrenome: profile[profile.length - 1],
+                email: req.body.email,
+                telefone: req.body.phone_number
+            }
+            console.log(post_data)
+            async function post() {
+                // send HTTP POST request to Python Flask Server 
+                const response = await axios.post('http://localhost:5000/adicionar_passageiro', post_data)
+                    
+                if (response.status === 200) {
+                    res.send(response.data)
+                } else {
+                    console.log(response.status)
+                    res.status(500).send('Internal Server Error')
+                }
+            }
+            post()
         }
     })
-
-    // send HTTP POST request to Database Server
-    const post_req = http.request(options, (response) => {
-        console.log(`Status code: ${response.statusCode}`)
-
-        let responseData = ''
-        response.on('data', (data) => { // listen on data
-            responseData += data
-        })
-        response.on('end', () => {
-            res.send(responseData)
-        })
-    })
-    post_req.on('error', (error) => { // in case of an error
-        console.log(`Error sending request: ${error.message}`)
-    })
-    post_req.write(post_data)
-    post_req.end()
 })
 
 app.get('/reservateroom', (req, res) => {
