@@ -107,6 +107,6 @@ Exemplo de resposta:
 ```
 ### To Do
 
-- [ ] Cancelar reserva pelo ID;
+- [x] Cancelar reserva pelo ID;
 - [x] Criar Base de Dados;
-- [ ] Definir uma quantidade limitada de quartos e categorias;
+- [x] Definir uma quantidade limitada de quartos e categorias;
