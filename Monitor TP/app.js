@@ -99,16 +99,16 @@ app.post('/transaction', (req, res) => {
     var options, post_data
     Object.keys(req.body).forEach(key => {
         if (key === "reservationChoice" && req.body[key] === "Hotel") {
-            post_data = `{
+            let status = req.body.status = "ativa"
+            post_data = {
                 nome_cliente: req.body.name,
-                email_client: req.body.email,
+                email_cliente: req.body.email,
                 telefone_cliente: req.body.phone_number,
-                tipo_quarto: req.body.room_type,
-                numero_quarto: req.body.room
+                tipo_quarto: req.body.room,
                 check_in: req.body.check_in,
                 check_out: req.body.check_out,
-                status: req.body.status
-            }`
+                status: status
+            }
             options = {
                 host: "0.0.0.0",
                 port: "8000",
@@ -118,6 +118,8 @@ app.post('/transaction', (req, res) => {
                     'Content-Type': 'application/json' 
                 }
             }
+
+            const postData = `${JSON.stringify(post_data)}`
 
             // send HTTP POST request to Hotel Database Server
             const post_req = http.request(options, (response) => {
@@ -134,7 +136,7 @@ app.post('/transaction', (req, res) => {
             post_req.on('error', (error) => { // in case of an error
                 console.log(`Error sending request: ${error.message}`)
             })
-            post_req.write(post_data)
+            post_req.write(postData)
             post_req.end()
 
         } else if (key === "reservationChoice" && req.body[key] != "Hotel") {
@@ -145,7 +147,7 @@ app.post('/transaction', (req, res) => {
                 email: req.body.email,
                 telefone: req.body.phone_number
             }
-            console.log(post_data)
+           
             async function post() {
                 // send HTTP POST request to Python Flask Server 
                 const response = await axios.post('http://localhost:5000/adicionar_passageiro', post_data)

@@ -41,9 +41,9 @@ if (clientData.reservationChoice === "Hotel") {
             type: 'list',
             message: 'Choose Room Type:',
             choices: [
-                "Classe A",
-                "Classe B",
-                "Classe C"
+                "A",
+                "B",
+                "C"
             ]
         })
 
@@ -158,11 +158,6 @@ if (clientData.reservationChoice === "Hotel") {
     /*
         * Operation Choose Delete Reservation
         * Make Reservation
-    */
-
-    // TO-DO
-    /* 
-        * Status implementation
     */
 
     await getRoom()
@@ -284,7 +279,7 @@ const options = {
 }
 
 let responseData = ""
-let mensagem
+let mensagem;
 const post_req = http.request(options, (res) => {
     //console.log(`Status code: ${res.statusCode}`)
     
@@ -292,12 +287,8 @@ const post_req = http.request(options, (res) => {
         responseData += chunk
     })
     res.on('end', () => {
-        const jsonData = JSON.parse(responseData)
-        Object.keys(jsonData["mensagem"]).forEach(key => {
-            mensagem = jsonData["mensagem"][key]
-            console.log(mensagem)
-            console.log(typeof mensagem)
-        })
+        const data = JSON.parse(responseData) // receive JSON file and convert it to an object
+        mensagem = data.mensagem
     })
 })
 post_req.on('error', (error) => {
