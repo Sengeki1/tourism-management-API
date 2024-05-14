@@ -288,7 +288,7 @@ const post_req = http.request(options, (res) => {
     })
     res.on('end', () => {
         const data = JSON.parse(responseData) // receive JSON file and convert it to an object
-        mensagem = data.mensagem
+        mensagem = data.message
     })
 })
 post_req.on('error', (error) => {

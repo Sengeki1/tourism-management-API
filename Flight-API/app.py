@@ -31,7 +31,7 @@ def adicionar_passageiro():
     conn.commit()
     conn.close()
 
-    return jsonify({'mensagem': "Reserva feita com sucesso!"}), 200
+    return jsonify({'message': "Reserva feita com sucesso!"}), 200
 
 # Rotas para listar passageiros e voos disponíveis
 @app.route('/listar_passageiros', methods=['GET'])
@@ -56,7 +56,7 @@ def listar_voos_disponiveis():
     voos = [dict(row) for row in rows]
 
     conn.close()
-    return jsonify({'mensagem': f'Listagem de voos disponíveis {voos}'})
+    return jsonify({'message': f'Listagem de voos disponíveis {voos}'})
 
 if __name__ == '__main__':
     app.run(debug=True)

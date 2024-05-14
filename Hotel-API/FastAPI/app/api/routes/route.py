@@ -18,7 +18,7 @@ async def criar_reserva(reserva: Reserva):
           reserva.check_out, reserva.status))
     conn.commit()
     conn.close()
-    return {"mensagem": "Reserva criada com sucesso"}
+    return {"message": "Reserva feita com sucesso!"}
 
 
 # Endpoint para obter todas as reservas

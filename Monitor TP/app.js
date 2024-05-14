@@ -112,7 +112,7 @@ app.post('/transaction', (req, res) => {
             options = {
                 host: "0.0.0.0",
                 port: "8000",
-                path: "/reservas/",
+                path: "/reserva/",
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json' 
