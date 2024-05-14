@@ -10,7 +10,7 @@ Install Dependencies:
 
 Execute shellScript:
 
-(Before executing the shellScript change the directory location inside the ```shellscript.py```)
+(Before executing the shellScript change the directory location on each file to be executed inside the ```shellscript.py```)
 
 * ```python3 shellscript.py```
 
