@@ -31,9 +31,27 @@ async function chooseReservation() {
 
     clientData.reservationChoice = choice.reservation
 }
+
+async function Operation() {
+
+    const choice = await inquirer.prompt({
+        name: 'operation',
+        type: 'list',
+        messaage: 'Choose the following Operation:',
+        choices: [
+            "Cancel Reservation",
+            "Make Reservation"
+        ]
+    })
+
+    clientData.operation = choice.operation
+}
+
 await chooseReservation()
 
 if (clientData.reservationChoice === "Hotel") {
+
+    await Operation()
 
     async function chooseRoom() {
         const answers = await inquirer.prompt({
@@ -154,20 +172,26 @@ if (clientData.reservationChoice === "Hotel") {
         clientData.room_type = answers.room_type
     }
 
-    // TO-DO 
-    /*
-        * Operation Choose Delete Reservation
-        * Make Reservation
-    */
+    if (clientData.operation === "Cancel Reservation") {
+        await clientName()
+        await clientEmail()
+        await clientPhone()
 
-    await getRoom()
-    await chooseRoom()
-    await getCheck_in()
-    await getCheck_out()
-    await clientName()
-    await clientEmail()
-    await clientPhone()
-    await roomType()
+        async function cancelReservation() {
+            //
+        }
+        await cancelReservation()
+
+    } else {
+        await getRoom()
+        await chooseRoom()
+        await getCheck_in()
+        await getCheck_out()
+        await clientName()
+        await clientEmail()
+        await clientPhone()
+        await roomType()
+    }
 
 } else { // Flight
     async function clientName() {
@@ -259,51 +283,138 @@ async function securityCode() {
     clientData.card.security = answers.card_security_code
 }
 
-await welcome()
-await typeCard()
-await cardName()
-await cardNumber()
-await cardDate()
-await securityCode()
+if (clientData.operation != "Cancel Reservation") {
+    await welcome()
+    await typeCard()
+    await cardName()
+    await cardNumber()
+    await cardDate()
+    await securityCode()
 
-const postData = `${JSON.stringify(clientData)}`
 
-const options = {
-    host: "127.0.0.1",
-    port: "3001",
-    path: "/transaction",
-    method: "POST",
-    headers: {
-        'Content-Type': 'application/json'
+    const postData = `${JSON.stringify(clientData)}`
+
+    const options = {
+        host: "127.0.0.1",
+        port: "3001",
+        path: "/transaction",
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    }
+
+    let responseData = ""
+    let mensagem, status
+    const post_req = http.request(options, (res) => {
+        status = res.statusCode
+        
+        res.on('data', (chunk) => {
+            responseData += chunk
+        })
+        res.on('end', () => {
+            const data = JSON.parse(responseData) // receive JSON file and convert it to an object
+            mensagem = data.message
+        })
+    })
+    post_req.on('error', (error) => {
+        console.log(`Error making request: ${error.message}`);
+    })
+    post_req.write(postData)
+    post_req.end()
+
+    async function final() {
+        const spinner = createSpinner("...").start()
+        await sleep()
+        if (clientData.reservationChoice === "Hotel" && mensagem === "Reserva feita com sucesso!" && status === 200) {
+            spinner.success({text: mensagem})
+        } else if (clientData.reservationChoice === "Hotel" && mensagem === "Reserva feita com sucesso!" && status != 200){
+            spinner.error({text: "Não há quartos disponíveis desta classe."})
+        } else if(clientData.reservationChoice === "Hotel" && status != 200) {
+            spinner.error({text: "Reserva não pode ser concluida"})
+        }else if (clientData.reservationChoice === "Flight Company" && status === 200){
+            spinner.success({text: "Reserva feita com sucesso!"})
+        } else {
+            spinner.error({text: "Reserva não pode ser concluida"})
+        }
+    }
+    await final()
+
+    if (clientData.reservationChoice === "Hotel" && status === 200) {
+        let reservations = ''
+
+        async function showDescription() {
+            return new Promise((resolve, reject) => {
+                const options = {
+                    host: "127.0.0.1",
+                    port: "3001",
+                    path: "/showReservation",
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+                const get_req = http.request(options, (res)=> {
+                    //console.log(`\nStatus code: ${res.statusCode}`)
+                    
+                    res.on('data', chunk => {
+                        reservations += chunk
+                    })
+                    res.on('end', () => {
+                        const jsonData = JSON.parse(reservations)
+                        Object.values(jsonData['reservas']).forEach(value => {
+                            if (clientData.email === value[2]) {
+                                console.log(`Reservation Description: ${value}`)
+                            }
+                        })
+                        resolve()
+                    })
+                })
+                get_req.on('error', (error) => {
+                    console.log(`\nError making HTTP request to the server: ${error.message}`)
+                    reject(error)
+                })
+                get_req.end()
+            })
+        }
+        await showDescription()
+    } else if (clientData.reservationChoice === "Flight Company" && status === 200){
+        let reservations = ''
+
+        async function showDescription() {
+            return new Promise((resolve, reject) => {
+                const options = {
+                    host: "127.0.0.1",
+                    port: "3001",
+                    path: "/showReservationtravel",
+                    method: "GET",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                }
+                const get_req = http.request(options, (res)=> {
+                    //console.log(`\nStatus code: ${res.statusCode}`)
+                    
+                    res.on('data', chunk => {
+                        reservations += chunk
+                    })
+                    res.on('end', () => {
+                        const jsonData = JSON.parse(reservations)
+                        jsonData.forEach(element => {
+                            if (clientData.email === element.email) {
+                                console.log(`Booking: Reservation sented to ${element.email}`)
+                            }
+                        })
+                        resolve()
+                    })
+                })
+                get_req.on('error', (error) => {
+                    console.log(`\nError making HTTP request to the server: ${error.message}`)
+                    reject(error)
+                })
+                get_req.end()
+            })
+        }
+        await showDescription()
     }
 }
-
-let responseData = ""
-let mensagem;
-const post_req = http.request(options, (res) => {
-    //console.log(`Status code: ${res.statusCode}`)
-    
-    res.on('data', (chunk) => {
-        responseData += chunk
-    })
-    res.on('end', () => {
-        const data = JSON.parse(responseData) // receive JSON file and convert it to an object
-        mensagem = data.message
-    })
-})
-post_req.on('error', (error) => {
-    console.log(`Error making request: ${error.message}`);
-})
-post_req.write(postData)
-post_req.end()
-
-async function final() {
-    const spinner = createSpinner("...").start()
-    await sleep()
-    if (mensagem === "Reserva feita com sucesso!") {
-        spinner.success({text: mensagem})
-    } else {
-        spinner.error({text: mensagem})
-    }
-}
-await final()

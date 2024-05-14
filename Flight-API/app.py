@@ -56,7 +56,7 @@ def listar_voos_disponiveis():
     voos = [dict(row) for row in rows]
 
     conn.close()
-    return jsonify({'message': f'Listagem de voos disponíveis {voos}'})
+    return jsonify(voos)
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -16,13 +16,13 @@ app.post('/transaction', (req, res) => {
     Object.keys(req.body).forEach(key => {
         if (typeof req.body[key] === "string" && req.body[key].trim() === "") {
             res.statusCode = 406
-            return res.send("missing fields")
+            return res.json({"text": "missing fields"})
         }
         if (key === "name") {
             var hasNumber = /\d/
             if(hasNumber.test(req.body[key])) { // returns true if string contains number
                 res.statusCode = 406
-                return res.send("error: invalid name")
+                return res.json({"text": "error: invalid name"})
             }
         }
         if (key === "email") {
@@ -96,8 +96,8 @@ app.post('/transaction', (req, res) => {
         }) 
     }
     
-    var options, post_data
-    Object.keys(req.body).forEach(key => {
+    var post_data
+    Object.keys(req.body).forEach(async key => {
         if (key === "reservationChoice" && req.body[key] === "Hotel") {
             let status = req.body.status = "ativa"
             post_data = {
@@ -109,7 +109,7 @@ app.post('/transaction', (req, res) => {
                 check_out: req.body.check_out,
                 status: status
             }
-            options = {
+            const options1 = {
                 host: "0.0.0.0",
                 port: "8000",
                 path: "/reserva/",
@@ -118,27 +118,65 @@ app.post('/transaction', (req, res) => {
                     'Content-Type': 'application/json' 
                 }
             }
+            const options2 = {
+                host: "0.0.0.0",
+                port: "8000",
+                path: "/reservas/",
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json' 
+                }
+            }
 
             const postData = `${JSON.stringify(post_data)}`
 
-            // send HTTP POST request to Hotel Database Server
-            const post_req = http.request(options, (response) => {
-                console.log(`Status code: ${response.statusCode}`)
-
-                let responseData = ''
-                response.on('data', (data) => { // listen on data
-                    responseData += data
-                })
-                response.on('end', () => {
-                    res.send(responseData)
-                })
-            })
-            post_req.on('error', (error) => { // in case of an error
-                console.log(`Error sending request: ${error.message}`)
-            })
-            post_req.write(postData)
-            post_req.end()
-
+            async function makeRequestReservas() { 
+                return new Promise((resolve, reject) => {
+                    const post_req = http.request(options1, (response) => {
+                        let statusCoder;
+                        console.log(`Status code Reserva: ${response.statusCode}`);
+                        statusCoder = response.statusCode;
+                        resolve(statusCoder); // Resolve the promise with status code
+                    });
+            
+                    post_req.on('error', (error) => { // in case of an error
+                        console.log(`Error sending request: ${error.message}`);
+                        reject(error); // Reject the promise with error
+                    });
+            
+                    post_req.write(postData);
+                    post_req.end();
+                });
+            }
+            
+            try {
+                const statusCoder = await makeRequestReservas(); // Await the completion of makeRequestReservas
+                if (statusCoder === 200) {
+                    const post_req = http.request(options2, (response) => {
+                        console.log(`Status code Reservas: ${response.statusCode}`);
+            
+                        let responseData = '';
+                        response.on('data', (data) => { // listen on data
+                            responseData += data;
+                        });
+            
+                        response.on('end', () => {
+                            if (response.statusCode === 200) {
+                                res.send(responseData);
+                            }
+                        });
+                    });
+            
+                    post_req.on('error', (error) => { // in case of an error
+                        console.log(`Error sending request: ${error.message}`);
+                    });
+            
+                    post_req.write(postData);
+                    post_req.end();
+                }
+            } catch (error) {
+                console.log(`Error in request: ${error.message}`);
+            }
         } else if (key === "reservationChoice" && req.body[key] != "Hotel") {
             let profile = req.body.name.split(" ")
             post_data = {
@@ -169,6 +207,50 @@ app.get('/reservateroom', (req, res) => {
         host: "0.0.0.0",
         port: "8000",
         path: "/quartos-disponiveis/",
+        method: "GET",
+    }
+
+    // get a HTTP GET request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.end() // End the request to the other server
+})
+
+app.get('/showReservation', (req, res) => {
+    const options = {
+        host: "0.0.0.0",
+        port: "8000",
+        path: "/reservas/",
+        method: "GET",
+    }
+
+    // get a HTTP GET request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.end() // End the request to the other server
+})
+
+app.get('/showReservationtravel', (req, res) => {
+    const options = {
+        host: "127.0.0.1",
+        port: "5000",
+        path: "/listar_passageiros",
         method: "GET",
     }
 
