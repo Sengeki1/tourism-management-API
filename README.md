@@ -10,7 +10,7 @@ Install Dependencies:
 
 Execute shellScript:
 
-* ```python3 shellscript```
+* ```python3 shellscript.py```
 
 It will execute the files inside the directories CLI, Monitor TP Server, Hotel-API & Flight-API, each on a diferent terminal
 
