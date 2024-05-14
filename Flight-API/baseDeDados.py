@@ -17,7 +17,7 @@ def criar_tabelas():
                         id INTEGER PRIMARY KEY,
                         nome TEXT NOT NULL,
                         sobrenome TEXT NOT NULL,
-                        email TEXT NOT NULL UNIQUE,
+                        email TEXT NOT NULL,
                         telefone TEXT
                     )''')
 
