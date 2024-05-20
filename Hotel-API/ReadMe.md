@@ -158,4 +158,5 @@ Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o fra
 
 - [x] Cancelar reserva pelo ID;
 - [x] Criar Base de Dados;
+- [x] CRUD Completo;
 - [x] Definir uma quantidade limitada de quartos e categorias;
