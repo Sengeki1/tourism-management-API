@@ -55,55 +55,131 @@ Espero que isso ajude!
 
 ## Exemplos de Requisições
 
-### Criar uma Nova Reserva
+### Criar uma nova reserva
 
-Envie um POST request para `/reservas/` com os dados da reserva em formato JSON.
-
-Exemplo:
-
-```json
-{
-  "nome_cliente": "João da Silva",
-  "email_cliente": "joao@example.com",
-  "telefone_cliente": "(+238) 999-9999",
-  "tipo_quarto": "A",
-  "check_in": 1620648000,  // Timestamp para 10 de maio de 2021, 12:00:00
-  "check_out": 1621104000, // Timestamp para 16 de maio de 2021, 12:00:00
-  "status": "ativa"
-}
-```
-
-### Obter Todas as Reservas
-
-Envie um GET request para `/reservas/`.
-
-Exemplo de resposta:
-
-```json
-{
-  "reservas": [
+- **URL**: `/reservas/`
+- **Método**: `POST`
+- **Payload**:
+    ```json
     {
-      "id": 1,
-      "nome_cliente": "João da Silva",
-      "email_cliente": "joao@example.com",
-      "telefone_cliente": "(+238) 999-9999",
-      "tipo_quarto": "B",
-      "check_in": 1620648000,
-      "check_out": 1621104000,
-      "status": "activa"
-    },
-    {
-      "id": 2,
-      "nome_cliente": "Maria Oliveira",
-      "email_cliente": "maria@example.com",
-      "telefone_cliente": "(+238) 999-9999",
-      "tipo_quarto": "C",
-      "check_in": 1622552400,
-      "check_out": 1623330000,
-      "status": "pendente"
+        "numero_BI": "123456789",
+        "nome_cliente": "John Doe",
+        "email_cliente": "john.doe@example.com",
+        "telefone_cliente": "1234567890",
+        "tipo_quarto": "A",
+        "check_in": "2024-06-01T14:00:00",
+        "check_out": "2024-06-05T12:00:00",
+        "status": "confirmada"
     }
-  ]
-}
+    ```
+- **Resposta**:
+    ```json
+    {
+        "numero_BI": "123456789",
+        "nome_cliente": "John Doe",
+        "email_cliente": "john.doe@example.com",
+        "telefone_cliente": "1234567890",
+        "tipo_quarto": "A",
+        "check_in": "2024-06-01T14:00:00",
+        "check_out": "2024-06-05T12:00:00",
+        "status": "confirmada"
+    }
+    ```
+
+### Obter todas as reservas
+
+- **URL**: `/reservas/`
+- **Método**: `GET`
+- **Resposta**:
+    ```json
+    [
+        {
+            "numero_BI": "123456789",
+            "nome_cliente": "John Doe",
+            "email_cliente": "john.doe@example.com",
+            "telefone_cliente": "1234567890",
+            "tipo_quarto": "A",
+            "check_in": "2024-06-01T14:00:00",
+            "check_out": "2024-06-05T12:00:00",
+            "status": "confirmada"
+        }
+    ]
+    ```
+
+### Cancelar uma reserva
+
+- **URL**: `/reserva/{numero_BI}/`
+- **Método**: `DELETE`
+- **Resposta**:
+    ```json
+    {
+        "message": "Reserva cancelada com sucesso."
+    }
+    ```
+
+### Obter disponibilidade dos quartos
+
+- **URL**: `/quartos-disponiveis/`
+- **Método**: `GET`
+- **Resposta**:
+    ```json
+    {
+        "Quartos disponíveis": {
+            "Classe A": 5,
+            "Classe B": 15,
+            "Classe C": 30
+        }
+    }
+    ```
+
+### Buscar uma reserva pelo número de BI
+
+- **URL**: `/reserva/{numero_BI}/`
+- **Método**: `GET`
+- **Resposta**:
+    ```json
+    {
+        "numero_BI": "123456789",
+        "nome_cliente": "John Doe",
+        "email_cliente": "john.doe@example.com",
+        "telefone_cliente": "1234567890",
+        "tipo_quarto": "A",
+        "check_in": "2024-06-01T14:00:00",
+        "check_out": "2024-06-05T12:00:00",
+        "status": "confirmada"
+    }
+    ```
+
+### Atualizar uma reserva
+
+- **URL**: `/reserva/{numero_BI}/`
+- **Método**: `PUT`
+- **Payload**:
+    ```json
+    {
+        "numero_BI": "123456789",
+        "nome_cliente": "John Doe",
+        "email_cliente": "john.doe@example.com",
+        "telefone_cliente": "1234567890",
+        "tipo_quarto": "A",
+        "check_in": "2024-06-01T14:00:00",
+        "check_out": "2024-06-05T12:00:00",
+        "status": "confirmada"
+    }
+    ```
+- **Resposta**:
+    ```json
+    {
+        "numero_BI": "123456789",
+        "nome_cliente": "John Doe",
+        "email_cliente": "john.doe@example.com",
+        "telefone_cliente": "1234567890",
+        "tipo_quarto": "A",
+        "check_in": "2024-06-01T14:00:00",
+        "check_out": "2024-06-05T12:00:00",
+        "status": "confirmada"
+    }
+
 ```
 ### To Do
 
