@@ -23,7 +23,7 @@ def get_db():
         db.close()
 
 # Endpoint para criar uma nova reserva
-@router.post("/reservas/", response_model=Reserva)
+@router.post("/criar_reserva/", response_model=Reserva)
 async def criar_reserva(reserva: ReservaCreate, db: Session = Depends(get_db)):
     try:
         db_reserva = adicionar_reserva(db, reserva)
@@ -37,7 +37,7 @@ async def obter_reservas(db: Session = Depends(get_db)):
     return obter_todas_reservas(db)
 
 # Endpoint para cancelar uma reserva
-@router.delete("/reserva/{numero_BI}/")
+@router.delete("/delete_reserva/{numero_BI}/")
 async def cancelar_reserva_endpoint(numero_BI: str, db: Session = Depends(get_db)):
     try:
         cancelar_reserva(db, numero_BI)
@@ -52,7 +52,7 @@ async def quartos_disponiveis(db: Session = Depends(get_db)):
     return {"Quartos disponíveis": {quarto.classe: quarto.quantidade for quarto in quartos}}
 
 # Endpoint para buscar uma reserva pelo número de BI
-@router.get("/reserva/{numero_BI}/", response_model=Reserva)
+@router.get("/buscar_reserva/{numero_BI}/", response_model=Reserva)
 async def buscar_reserva(numero_BI: str, db: Session = Depends(get_db)):
     db_reserva = buscar_reserva_por_numero_BI(db, numero_BI)
     if not db_reserva:
@@ -60,7 +60,7 @@ async def buscar_reserva(numero_BI: str, db: Session = Depends(get_db)):
     return db_reserva
 
 # Endpoint para atualizar uma reserva
-@router.put("/reserva/{numero_BI}/", response_model=Reserva)
+@router.put("/atualizar_reserva/{numero_BI}/", response_model=Reserva)
 async def atualizar_reserva_endpoint(numero_BI: str, reserva_update: ReservaUpdate, db: Session = Depends(get_db)):
     try:
         db_reserva = atualizar_reserva(db, numero_BI, reserva_update)
