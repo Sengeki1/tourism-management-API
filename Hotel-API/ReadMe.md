@@ -152,7 +152,7 @@ Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o fra
         "check_out": "2024-06-05T12:00:00",
         "status": "confirmada"
     }
-
+```
 ```
 ### To Do
 
