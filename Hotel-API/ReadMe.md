@@ -23,20 +23,14 @@ Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o fra
    - A API deve garantir a segurança dos dados dos clientes.
 
 
-### Requisitos de Interface:
-
-1. **Endpoint para Criar uma Nova Reserva:**
-   - `POST /reservas/`
-
-2. **Endpoint para Obter Todas as Reservas:**
-   - `GET /reservas/`
-
-Espero que isso ajude!
-
 ## Funcionalidades
 
 - Criar uma nova reserva de hotel.
 - Obter todas as reservas de hotel.
+- Obter quartos disponiveis.
+- Obter uma reserva pelo numero de BI.
+- Cancelar reserva pelo numero de BI.
+- Atualizar reserva pelo numero de BI.
 
 
 ## Uso
@@ -57,7 +51,7 @@ Espero que isso ajude!
 
 ### Criar uma nova reserva
 
-- **URL**: `/reservas/`
+- **URL**: `/criar_reserva/`
 - **Método**: `POST`
 - **Payload**:
     ```json
@@ -108,7 +102,7 @@ Espero que isso ajude!
 
 ### Cancelar uma reserva
 
-- **URL**: `/reserva/{numero_BI}/`
+- **URL**: `/cancelar_reserva/{numero_BI}/`
 - **Método**: `DELETE`
 - **Resposta**:
     ```json
@@ -134,7 +128,7 @@ Espero que isso ajude!
 
 ### Buscar uma reserva pelo número de BI
 
-- **URL**: `/reserva/{numero_BI}/`
+- **URL**: `/buscar_reserva/{numero_BI}/`
 - **Método**: `GET`
 - **Resposta**:
     ```json
@@ -152,7 +146,7 @@ Espero que isso ajude!
 
 ### Atualizar uma reserva
 
-- **URL**: `/reserva/{numero_BI}/`
+- **URL**: `/atualizar_reserva/{numero_BI}/`
 - **Método**: `PUT`
 - **Payload**:
     ```json
