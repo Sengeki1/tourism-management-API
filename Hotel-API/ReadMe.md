@@ -162,3 +162,4 @@ Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o fra
 - [ ] Criar Diagramas Explicando o Codigo;
 - [ ] Adicionar preco de Quartos;
 - [ ] Criar no server um metodo de autenticacao;
+- [ ] Sistema de pagamento(strike);
