@@ -1,3 +1,4 @@
+// Importação de módulos
 const express = require('express')
 const valid = require('card-validator')
 const http = require('http')
@@ -8,19 +9,20 @@ const bodyParser = require('body-parser')
 
 const app = express()
 
-app.use(bodyParser.json())
+app.use(bodyParser.json()) // configura o aplicativo para usar body-parser para processar JSON.
 
 app.post('/transaction', (req, res) => {
-    console.log(req.body)
+    console.log(req.body) // Recebe uma requisição para processar uma transação.
 
-    Object.keys(req.body).forEach(key => {
+    // Valida os campos enviados no corpo da requisição
+    Object.keys(req.body).forEach(key => { // faz iteração nos campos
         if (typeof req.body[key] === "string" && req.body[key].trim() === "") {
-            res.statusCode = 406
+            res.statusCode = 406 //Not Acceptable
             return res.json({"text": "missing fields"})
         }
         if (key === "name") {
             var hasNumber = /\d/
-            if(hasNumber.test(req.body[key])) { // returns true if string contains number
+            if(hasNumber.test(req.body[key])) { // retorna true se o nome conter numeros
                 res.statusCode = 406
                 return res.json({"text": "error: invalid name"})
             }
@@ -63,7 +65,7 @@ app.post('/transaction', (req, res) => {
                 }
             }
             if (key === "number") {
-                const numericInput = req.body.card[key].replace(/\D/g, '') // removes all non-numeric characters from the input string
+                const numericInput = req.body.card[key].replace(/\D/g, '') // remove todos os caracteres nao numericos do input string
                 const int = parseInt(numericInput)
 
                 var numberValid = valid.number(int)
@@ -88,7 +90,7 @@ app.post('/transaction', (req, res) => {
             }
             if (key === "name") {
                 var hasNumber = /\d/
-                if(hasNumber.test(req.body.card[key])) { // returns true if string contains number
+                if(hasNumber.test(req.body.card[key])) { // retorna true se a string conter numero
                     res.statusCode = 406
                     return res.send("error: invalid card name")
                 }
@@ -96,6 +98,7 @@ app.post('/transaction', (req, res) => {
         }) 
     }
     
+    // Se a escolha de reserva for "Hotel", envia uma solicitação POST para um servidor remoto para criar uma reserva.
     var post_data
     Object.keys(req.body).forEach(async key => {
         if (key === "reservationChoice" && req.body[key] === "Hotel") {
