@@ -1,20 +1,9 @@
-from app.database.session import conectar_bd
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from app.api.models.model import Base
+from app.database.session import init_db, engine
 
+def verificar_tabela_reservas(): 
+    Base.metadata.create_all(bind=engine)
 
-def verificar_tabela_reservas():
-    conn = conectar_bd()
-    cursor = conn.cursor()
-    cursor.execute('''
-        CREATE TABLE IF NOT EXISTS reservas (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            nome_cliente TEXT,
-            email_cliente TEXT,
-            telefone_cliente TEXT,
-            tipo_quarto TEXT,
-            check_in INTEGER,
-            check_out INTEGER,
-            status TEXT
-        )
-    ''')
-    conn.commit()
-    conn.close()
+verificar_tabela_reservas()
