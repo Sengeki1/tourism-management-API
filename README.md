@@ -20,3 +20,12 @@ It will execute the files inside the directories CLI, Monitor TP Server, Hotel-A
   * ```npm run start``` for the Monitor TP Server
   * ```python3 run.py``` for the Hotel-API Server
   * ```python3 app.py``` for the Flight-API Server
+
+## Class Diagram
+
+![Class](https://github.com/Jerry-523/tourism-management-API/assets/92488227/8634bdb8-6be0-4257-b039-ca703b8ef752)
+
+## Sequence Diagram
+
+![Sequence](https://github.com/Jerry-523/tourism-management-API/assets/92488227/2fedec43-8e76-4f6d-a3d4-002ef729352a)
+
