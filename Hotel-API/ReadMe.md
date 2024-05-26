@@ -153,6 +153,15 @@ Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o fra
         "status": "confirmada"
     }
 
+### Diagrama de Entidade Relacionamento
+
+![ERD](https://github.com/Jerry-523/tourism-management-API/assets/92488227/0a45173b-0712-4e58-b38d-5d2a39ac3f1f)
+
+### Diagrama de Sequencia
+
+![Diagrama de Sequencia_Hotel](https://github.com/Jerry-523/tourism-management-API/assets/92488227/384553e7-e980-48f9-b5f8-57ca453e639a)
+
+
 ### To Do
 
 - [x] Cancelar reserva pelo ID;
