@@ -1,5 +1,4 @@
 import sqlite3
-from datetime import datetime, timedelta
 
 # Função para conectar ao banco de dados
 def conectar_bd():
@@ -12,13 +11,16 @@ def criar_tabelas():
     conn = conectar_bd()
     cursor = conn.cursor()
 
-    # Tabela para passageiros
+# Tabela para passageiros
     cursor.execute('''CREATE TABLE IF NOT EXISTS Passageiros (
                         id INTEGER PRIMARY KEY,
                         nome TEXT NOT NULL,
                         sobrenome TEXT NOT NULL,
                         email TEXT NOT NULL,
-                        telefone TEXT
+                        telefone TEXT,
+                        bi TEXT NOT NULL,
+                        passaporte TEXT NOT NULL,
+                        UNIQUE(email, bi, passaporte)
                     )''')
 
     # Tabela para voos
@@ -30,6 +32,7 @@ def criar_tabelas():
                         hora_partida TIME NOT NULL,
                         hora_prevista_partida TIME NOT NULL,
                         vagas INTEGER NOT NULL,
+                        tipo_voo TEXT CHECK( tipo_voo IN ('Voo Direto', 'Voo com Escala', 'Voo Conexão') ) NOT NULL,
                         CONSTRAINT origem_destino_ck CHECK (origem <> destino)
                     )''')
 
@@ -40,7 +43,8 @@ def criar_tabelas():
                         voo_id INTEGER NOT NULL,
                         data_reserva DATE NOT NULL,
                         FOREIGN KEY (passageiro_id) REFERENCES Passageiros(id),
-                        FOREIGN KEY (voo_id) REFERENCES Voos(id)
+                        FOREIGN KEY (voo_id) REFERENCES Voos(id),
+                        UNIQUE(passageiro_id, voo_id)
                     )''')
 
     # Tabela para registrar atrasos
