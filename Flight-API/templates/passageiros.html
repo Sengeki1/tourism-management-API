@@ -7,10 +7,27 @@
 </head>
 <body>
     <h1>Lista de Passageiros</h1>
-    <ul>
-        {% for passageiro in passageiros %}
-        <li>ID: {{ passageiro['id'] }}, Nome: {{ passageiro['nome'] }}, Sobrenome: {{ passageiro['sobrenome'] }}, Email: {{ passageiro['email'] }}, Telefone: {{ passageiro['telefone'] }}</li>
-        {% endfor %}
-    </ul>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Nome</th>
+                <th>Sobrenome</th>
+                <th>Email</th>
+                <th>Telefone</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for passageiro in passageiros %}
+            <tr>
+                <td>{{ passageiro['id'] }}</td>
+                <td>{{ passageiro['nome'] }}</td>
+                <td>{{ passageiro['sobrenome'] }}</td>
+                <td>{{ passageiro['email'] }}</td>
+                <td>{{ passageiro['telefone'] }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </body>
 </html>

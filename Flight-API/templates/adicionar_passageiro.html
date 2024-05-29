@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Adicionar Passageiro</title>
+</head>
+<body>
+    <h1>Adicionar Passageiro</h1>
+    <form id="adicionarPassageiroForm">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required><br>
+
+        <label for="sobrenome">Sobrenome:</label>
+        <input type="text" id="sobrenome" name="sobrenome" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="telefone">Telefone:</label>
+        <input type="text" id="telefone" name="telefone" required><br>
+
+        <label for="bi">BI:</label>
+        <input type="text" id="bi" name="bi" required><br>
+
+        <label for="passaporte">Passaporte:</label>
+        <input type="text" id="passaporte" name="passaporte" required><br>
+
+        <button type="submit">Adicionar Passageiro</button>
+    </form>
+
+    <p id="mensagem"></p>
+
+    <script>
+        document.getElementById('adicionarPassageiroForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                nome: document.getElementById('nome').value,
+                sobrenome: document.getElementById('sobrenome').value,
+                email: document.getElementById('email').value,
+                telefone: document.getElementById('telefone').value,
+                bi: document.getElementById('bi').value,
+                passaporte: document.getElementById('passaporte').value
+            };
+
+            fetch('/adicionar_passageiro', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('mensagem').innerText = data.mensagem;
+            })
+            .catch(error => {
+                document.getElementById('mensagem').innerText = 'Erro ao adicionar passageiro: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>

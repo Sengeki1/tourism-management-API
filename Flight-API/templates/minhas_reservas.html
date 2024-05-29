@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minhas Reservas</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Minhas Reservas</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Origem</th>
+                    <th>Destino</th>
+                    <th>Data</th>
+                    <th>Hora de Partida</th>
+                </tr>
+            </thead>
+            <tbody id="reservas-body">
+                <!-- As reservas serão preenchidas aqui -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Função para carregar as reservas do usuário
+        function carregarReservas() {
+            const token = localStorage.getItem('token'); // Obter o token armazenado no localStorage
+            if (!token) {
+                console.error('Token não encontrado!');
+                return;
+            }
+
+            fetch('/minhas_reservas', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-tokens': token // Incluir o token no cabeçalho da requisição
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const reservasBody = document.getElementById('reservas-body');
+                reservasBody.innerHTML = ''; // Limpar o conteúdo atual
+                data.forEach(reserva => {
+                    const row = `
+                        <tr>
+                            <td>${reserva.id}</td>
+                            <td>${reserva.origem}</td>
+                            <td>${reserva.destino}</td>
+                            <td>${reserva.data}</td>
+                            <td>${reserva.hora_partida}</td>
+                        </tr>
+                    `;
+                    reservasBody.innerHTML += row; // Adicionar cada reserva como uma linha na tabela
+                });
+            })
+            .catch(error => console.error('Erro ao carregar reservas:', error));
+        }
+
+        // Chamar a função para carregar as reservas ao carregar a página
+        carregarReservas();
+    </script>
+</body>
+</html>

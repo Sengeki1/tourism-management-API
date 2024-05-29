@@ -11,7 +11,7 @@ def criar_tabelas():
     conn = conectar_bd()
     cursor = conn.cursor()
 
-# Tabela para passageiros
+    # Tabela para passageiros
     cursor.execute('''CREATE TABLE IF NOT EXISTS Passageiros (
                         id INTEGER PRIMARY KEY,
                         nome TEXT NOT NULL,
@@ -54,6 +54,13 @@ def criar_tabelas():
                         horas_atraso INTEGER NOT NULL,
                         data_registro DATE NOT NULL,
                         FOREIGN KEY (voo_id) REFERENCES Voos(id)
+                    )''')
+
+    # Tabela para usuários
+    cursor.execute('''CREATE TABLE IF NOT EXISTS Usuarios (
+                        id INTEGER PRIMARY KEY,
+                        username TEXT UNIQUE NOT NULL,
+                        senha TEXT NOT NULL
                     )''')
 
     conn.commit()

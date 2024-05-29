@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Reservar Voo</title>
+</head>
+<body>
+    <h1>Reservar Voo</h1>
+    <form id="reservarVooForm">
+        <label for="passageiro_id">ID do Passageiro:</label>
+        <input type="number" id="passageiro_id" name="passageiro_id" required><br>
+
+        <label for="voo_id">ID do Voo:</label>
+        <input type="number" id="voo_id" name="voo_id" required><br>
+
+        <button type="submit">Reservar Voo</button>
+    </form>
+
+    <p id="mensagem"></p>
+
+    <script>
+        document.getElementById('reservarVooForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = {
+                passageiro_id: document.getElementById('passageiro_id').value,
+                voo_id: document.getElementById('voo_id').value
+            };
+
+            fetch('/reservar_voo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(formData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('mensagem').innerText = data.mensagem;
+            })
+            .catch(error => {
+                document.getElementById('mensagem').innerText = 'Erro ao reservar voo: ' + error;
+            });
+        });
+    </script>
+</body>
+</html>

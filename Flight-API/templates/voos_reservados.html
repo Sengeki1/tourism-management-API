@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voos Reservados</title>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Voos Reservados</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID do Voo</th>
+                <th>Origem</th>
+                <th>Destino</th>
+                <th>Data</th>
+                <th>Hora de Partida</th>
+            </tr>
+        </thead>
+        <tbody id="voosReservadosBody">
+            <!-- Aqui serão inseridos os dados dos voos reservados -->
+        </tbody>
+    </table>
+
+    <script>
+        // Função para carregar os voos reservados via AJAX
+        function carregarVoosReservados() {
+            fetch('/voos_reservados') // Rota para obter os voos reservados
+                .then(response => response.json())
+                .then(data => {
+                    const tbody = document.getElementById('voosReservadosBody');
+                    tbody.innerHTML = ''; // Limpa os dados antigos
+
+                    data.forEach(voo => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td>${voo.id}</td>
+                            <td>${voo.origem}</td>
+                            <td>${voo.destino}</td>
+                            <td>${voo.data}</td>
+                            <td>${voo.hora_partida}</td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                })
+                .catch(error => {
+                    console.error('Erro ao carregar voos reservados:', error);
+                });
+        }
+
+        // Carregar os voos reservados quando a página for carregada
+        window.addEventListener('load', carregarVoosReservados);
+    </script>
+</body>
+</html>

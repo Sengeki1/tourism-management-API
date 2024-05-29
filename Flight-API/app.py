@@ -1,10 +1,14 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, request, jsonify, render_template
 import sqlite3
-import baseDeDados as BD  # Importe o módulo baseDeDados.py
 from datetime import datetime
 from threading import Lock
+import jwt
+import baseDeDados as BD  # Importe o módulo baseDeDados.py
+from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 app = Flask(__name__)
+app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a random secret key
 
 # Função para conectar ao banco de dados
 def conectar_bd():
@@ -17,6 +21,78 @@ BD.criar_tabelas()
 
 # Lock para gerenciar concorrência
 lock = Lock()
+
+# Decorator para verificar o token
+def token_required(f):
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        token = None
+        if 'x-access-tokens' in request.headers:
+            token = request.headers['x-access-tokens']
+        
+        if not token:
+            return jsonify({'mensagem': 'Token não está presente!'}), 401
+
+        try:
+            data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=["HS256"])
+            conn = conectar_bd()
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM Usuarios WHERE id = ?", (data['id'],))
+            current_user = cursor.fetchone()
+        except:
+            return jsonify({'mensagem': 'Token é inválido!'}), 401
+        
+        return f(current_user, *args, **kwargs)
+    return decorated
+
+# Rota para registrar usuário
+@app.route('/registrar_form')
+def registrar_form():
+    return render_template('registrar.html')
+
+# Rota para registrar usuário
+@app.route('/registrar', methods=['POST'])
+def registrar():
+    data = request.get_json()
+    username = data['username']
+    senha = data['senha']
+    hashed_password = generate_password_hash(senha, method='sha256')
+
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("INSERT INTO Usuarios (username, senha) VALUES (?, ?)", (username, hashed_password))
+        conn.commit()
+    except sqlite3.IntegrityError:
+        return jsonify({'mensagem': 'Usuário já existe!'}), 400
+    finally:
+        conn.close()
+    
+    return jsonify({'mensagem': 'Usuário registrado com sucesso!'}), 200
+
+# Rota para login
+@app.route('/login_form')
+def login_form():
+    return render_template('login.html')
+
+# Rota para login
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data['username']
+    senha = data['senha']
+
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM Usuarios WHERE username = ?", (username,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if not user or not check_password_hash(user['senha'], senha):
+        return jsonify({'mensagem': 'Login ou senha incorretos!'}), 401
+
+    token = jwt.encode({'id': user['id'], 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)}, app.config['SECRET_KEY'], algorithm="HS256")
+    return jsonify({'token': token})
 
 # Rota para listar passageiros
 @app.route('/listar_passageiros')
@@ -81,7 +157,8 @@ def reservar_voo_form():
 
 # Rota para reservar um voo (processa os dados)
 @app.route('/reservar_voo', methods=['POST'])
-def reservar_voo():
+@token_required
+def reservar_voo(current_user):
     try:
         data = request.get_json()
         passageiro_id = data.get('passageiro_id')
@@ -121,8 +198,7 @@ def reservar_voo():
     finally:
         conn.close()
 
-    
- # Rota para listar voos reservados
+# Rota para listar voos reservados
 @app.route('/voos_reservados')
 def voos_reservados():
     conn = conectar_bd()
@@ -147,6 +223,27 @@ def voos_reservados():
 @app.route('/voos_reservados_pagina')
 def voos_reservados_pagina():
     return render_template('voos_reservados.html')
+
+# Rota para listar as reservas do usuário
+@app.route('/minhas_reservas', methods=['GET'])
+@token_required
+def minhas_reservas(current_user):
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    cursor.execute('''SELECT R.id, V.origem, V.destino, V.data, V.hora_partida
+                      FROM Voos V
+                      INNER JOIN Reservas R ON V.id = R.voo_id
+                      WHERE R.passageiro_id = ?''', (current_user['id'],))
+    reservas = cursor.fetchall()
+    conn.close()
+    return render_template('minhas_reservas.html', reservas=reservas)
+
+# Rota para renderizar a página HTML de reservas do usuário
+@app.route('/minhas_reservas_pagina')
+@token_required
+def minhas_reservas_pagina(current_user):
+    return render_template('minhas_reservas.html')
+
 
 if __name__ == '__main__':
     app.run(debug=True)

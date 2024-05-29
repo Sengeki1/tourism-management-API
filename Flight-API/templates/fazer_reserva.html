@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fazer Reserva</title>
+</head>
+<body>
+    <h1>Fazer Reserva</h1>
+    <form id="reservaForm">
+        <label for="voo_id">ID do Voo:</label><br>
+        <input type="text" id="voo_id" name="voo_id"><br><br>
+        <button type="button" onclick="fazerReserva()">Fazer Reserva</button>
+    </form>
+
+    <div id="mensagem"></div>
+
+    <script>
+        function fazerReserva() {
+            var vooId = document.getElementById("voo_id").value;
+
+            fetch('/fazer_reserva', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-access-tokens': localStorage.getItem('token')
+                },
+                body: JSON.stringify({ voo_id: vooId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("mensagem").innerText = data.mensagem;
+            })
+            .catch(error => {
+                console.error('Erro ao fazer reserva:', error);
+            });
+        }
+    </script>
+</body>
+</html>
