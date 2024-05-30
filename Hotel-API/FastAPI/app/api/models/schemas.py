@@ -19,7 +19,7 @@ class ReservaUpdate(ReservaBase):
 
 class ReservaInDBBase(ReservaBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 class Reserva(ReservaInDBBase):
     pass
@@ -32,5 +32,5 @@ class Quarto(QuartoBase):
     id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 

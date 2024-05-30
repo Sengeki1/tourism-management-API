@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database.session import SessionLocal
 from app.api.models.schemas import ReservaCreate, ReservaUpdate, Reserva
@@ -11,7 +11,6 @@ from app.api.crud import (
     atualizar_reserva
 )
 
-app = FastAPI()
 router = APIRouter()
 
 # Dependência para obter a sessão de banco de dados
@@ -67,6 +66,3 @@ async def atualizar_reserva_endpoint(numero_BI: str, reserva_update: ReservaUpda
         return db_reserva
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
-
-# Incluindo as rotas
-app.include_router(router)
