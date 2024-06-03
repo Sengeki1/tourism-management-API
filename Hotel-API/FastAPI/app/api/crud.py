@@ -1,7 +1,24 @@
 from sqlalchemy.orm import Session
 from app.api.models.model import Reserva, Quarto
 from app.api.models.schemas import ReservaCreate, ReservaUpdate
+from app.api.models.model import User
+from app.api.models.schemas import UserCreate
+from app.api.auth import get_password_hash
 
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+def create_user(db: Session, user: UserCreate):
+    db_user = User(
+        username=user.username,
+        email=user.email,
+        hashed_password=get_password_hash(user.password),
+        is_active=True
+    )
+    db.add(db_user)
+    db.commit()
+    db.refresh(db_user)
+    return db_user
 def adicionar_reserva(db: Session, reserva: ReservaCreate) -> Reserva:
     quarto = db.query(Quarto).filter(Quarto.classe == reserva.tipo_quarto).first()
     if not quarto or quarto.quantidade <= 0:

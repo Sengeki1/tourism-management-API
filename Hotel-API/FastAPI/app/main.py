@@ -1,11 +1,19 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-import aiohttp
-
-from app.api.routes import route
+from app.api.routes import route, login
 from app.database.base import verificar_tabela_reservas
 
 app = FastAPI()
+
+# Add CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 verificar_tabela_reservas()
 
@@ -23,13 +31,5 @@ async def read_root():
     </html>
     """
 
-
-@app.get("/external-api", tags=["External[Example]"])
-async def call_external_api():
-    async with aiohttp.ClientSession() as session:
-        async with session.get('https://jsonplaceholder.typicode.com/todos/1') as response:
-            data = await response.json()
-            return data
-
-
 app.include_router(route.router, tags=["Rotas"])
+app.include_router(login.router, tags=["Login"])
