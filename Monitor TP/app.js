@@ -8,7 +8,7 @@ const {phone} = require('phone')
 const bodyParser = require('body-parser')
 
 const app = express()
-
+const statusPassanger = 0
 app.use(bodyParser.json()) // configura o aplicativo para usar body-parser para processar JSON.
 
 app.post('/transaction', (req, res) => {
@@ -155,7 +155,9 @@ app.post('/transaction', (req, res) => {
                 nome: profile[0],
                 sobrenome: profile[profile.length - 1],
                 email: req.body.email,
-                telefone: req.body.phone_number
+                telefone: req.body.phone_number,
+                bi: req.body.BI,
+                passaporte: req.body.passaport
             }
            
             async function post() {
@@ -164,12 +166,13 @@ app.post('/transaction', (req, res) => {
                     
                 if (response.status === 200) {
                     res.send(response.data)
+                    statusPassanger = response.status
                 } else {
                     console.log(response.status)
                     res.status(500).send('Internal Server Error')
                 }
             }
-            post()
+            await post()
         }
     })
 })
@@ -196,7 +199,7 @@ app.get('/reservateroom', (req, res) => {
     get_req.end() // End the request to the other server
 })
 
-app.post('/delete_reserva', (req, res) => {
+app.post('/delete_reservation', (req, res) => {
     const options = {
         host: "0.0.0.0",
         port: "8000",
@@ -288,6 +291,107 @@ app.get('/showReservationtravel', (req, res) => {
         host: "127.0.0.1",
         port: "5000",
         path: "/listar_passageiros",
+        method: "GET",
+    }
+
+    // get a HTTP GET request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.end() // End the request to the other server
+})
+
+app.post('/login', (req, res) => {
+    const post_data = {
+        username: req.body.username,
+        senha: req.body.senha
+    }
+    const options = {
+        host: "127.0.0.1",
+        port: "5000",
+        path: "/login",
+        method: "POST",
+    }
+    
+    const postData = `${JSON.stringify(post_data)}`
+    // get a HTTP POST request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.write(postData)
+    get_req.end() // End the request to the other server
+})
+
+app.post('/register', (req, res) => {
+    const post_data = {
+        username: req.body.username,
+        senha: req.body.senha
+    }
+    const options = {
+        host: "127.0.0.1",
+        port: "5000",
+        path: "/registrar",
+        method: "POST",
+    }
+    
+    const postData = `${JSON.stringify(post_data)}`
+    // get a HTTP POST request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.write(postData)
+    get_req.end() // End the request to the other server
+})
+
+app.post('/reservate_flight', async (req, res) => {
+    if (statusPassanger === 200) {
+        const post_data = {
+            passageiro_id: req.body.passenger_id,
+            voo_id: flight_id
+        }
+       
+        async function post() {
+            // send HTTP POST request to Python Flask Server 
+            const response = await axios.post('http://localhost:5000/reservar_voo', post_data)
+                
+            if (response.status === 200) {
+                res.send(response.data)
+                status = response.status
+            } else {
+                console.log(response.status)
+                res.status(500).send('Internal Server Error')
+            }
+        }
+        await post()
+    }
+})
+
+app.get('flight_reserved', (req, res) => {
+    const options = {
+        host: "127.0.0.1",
+        port: "5000",
+        path: "/voos_reservados",
         method: "GET",
     }
 
