@@ -1,15 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException
+from datetime import timedelta
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from fastapi.security import OAuth2PasswordRequestForm
 from app.database.session import SessionLocal
-from app.api.models.schemas import ReservaCreate, ReservaUpdate, Reserva
+from app.api.models.schemas import UserCreate, User, Token, ReservaCreate, ReservaUpdate, Reserva
 from app.api.crud import (
     adicionar_reserva, 
     cancelar_reserva, 
     obter_todas_reservas, 
     obter_quartos_disponiveis, 
     buscar_reserva_por_numero_BI, 
-    atualizar_reserva
+    atualizar_reserva,
+    create_user,
 )
+from app.api.auth import ACCESS_TOKEN_EXPIRE_MINUTES, authenticate_user, create_access_token, get_current_user
 
 router = APIRouter()
 
@@ -21,9 +25,10 @@ def get_db():
     finally:
         db.close()
 
+
 # Endpoint para criar uma nova reserva
 @router.post("/criar_reserva/", response_model=Reserva)
-async def criar_reserva(reserva: ReservaCreate, db: Session = Depends(get_db)):
+async def criar_reserva(reserva: ReservaCreate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         db_reserva = adicionar_reserva(db, reserva)
         return db_reserva
@@ -32,12 +37,12 @@ async def criar_reserva(reserva: ReservaCreate, db: Session = Depends(get_db)):
 
 # Endpoint para obter todas as reservas
 @router.get("/reservas/", response_model=list[Reserva])
-async def obter_reservas(db: Session = Depends(get_db)):
+async def obter_reservas(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     return obter_todas_reservas(db)
 
 # Endpoint para cancelar uma reserva
 @router.delete("/delete_reserva/{numero_BI}/")
-async def cancelar_reserva_endpoint(numero_BI: str, db: Session = Depends(get_db)):
+async def cancelar_reserva_endpoint(numero_BI: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         cancelar_reserva(db, numero_BI)
         return {"message": "Reserva cancelada com sucesso."}
@@ -46,13 +51,13 @@ async def cancelar_reserva_endpoint(numero_BI: str, db: Session = Depends(get_db
 
 # Endpoint para obter a disponibilidade dos quartos
 @router.get("/quartos-disponiveis/")
-async def quartos_disponiveis(db: Session = Depends(get_db)):
+async def quartos_disponiveis(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     quartos = obter_quartos_disponiveis(db)
     return {"Quartos disponíveis": {quarto.classe: quarto.quantidade for quarto in quartos}}
 
 # Endpoint para buscar uma reserva pelo número de BI
 @router.get("/buscar_reserva/{numero_BI}/", response_model=Reserva)
-async def buscar_reserva(numero_BI: str, db: Session = Depends(get_db)):
+async def buscar_reserva(numero_BI: str, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     db_reserva = buscar_reserva_por_numero_BI(db, numero_BI)
     if not db_reserva:
         raise HTTPException(status_code=404, detail="Reserva não encontrada.")
@@ -60,7 +65,7 @@ async def buscar_reserva(numero_BI: str, db: Session = Depends(get_db)):
 
 # Endpoint para atualizar uma reserva
 @router.put("/atualizar_reserva/{numero_BI}/", response_model=Reserva)
-async def atualizar_reserva_endpoint(numero_BI: str, reserva_update: ReservaUpdate, db: Session = Depends(get_db)):
+async def atualizar_reserva_endpoint(numero_BI: str, reserva_update: ReservaUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
     try:
         db_reserva = atualizar_reserva(db, numero_BI, reserva_update)
         return db_reserva
