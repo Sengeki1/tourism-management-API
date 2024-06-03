@@ -198,7 +198,8 @@ Acesse a documentação da API em seu navegador:
 
 ### Diagrama de Entidade Relacionamento
 
-![ERD](https://github.com/Jerry-523/tourism-management-API/assets/92488227/0a45173b-0712-4e58-b38d-5d2a39ac3f1f)
+![diagramaa](https://github.com/Sengeki1/tourism-management-API/assets/92488227/24794d2d-0665-48a9-a640-c111bde174a3)
+
 
 ### Diagrama de Sequencia
 
