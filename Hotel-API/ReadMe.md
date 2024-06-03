@@ -1,157 +1,200 @@
 # API de Gestão de Reservas de Hotel
 
-Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o framework FastAPI e banco de dados SQLite e SQLAlchemy.
+Esta é uma API para gestão de reservas de hotel, desenvolvida utilizando o framework FastAPI e banco de dados SQLite e SQLAlchemy.
 
 ## Funcionalidades
 
 - Criar uma nova reserva de hotel.
 - Obter todas as reservas de hotel.
-- Obter quartos disponiveis.
-- Obter uma reserva pelo numero de BI.
-- Cancelar reserva pelo numero de BI.
-- Atualizar reserva pelo numero de BI.
+- Obter quartos disponíveis.
+- Obter uma reserva pelo número de BI.
+- Cancelar reserva pelo número de BI.
+- Atualizar reserva pelo número de BI.
 
+## Segurança
+
+A API utiliza autenticação baseada em JWT para proteger as rotas e garantir que apenas usuários autenticados possam acessar e modificar os dados.
 
 ## Uso
 
-1. Execute o servidor(dentro do diretorio FastAPI):
+### Executar o servidor
 
-    ```bash
-    uvicorn run:app --reload
-    ```
+Dentro do diretório do projeto, execute o seguinte comando para iniciar o servidor:
 
-2. Acesse a documentação da API em seu navegador:
+```bash
+uvicorn main:app --reload
+```
 
-    ```
-    http://localhost:8000/docs
-    ```
+### Acessar a documentação
 
-## Exemplos de Requisições
+Acesse a documentação da API em seu navegador:
 
-### Criar uma nova reserva
+[http://localhost:8000/docs](http://localhost:8000/docs)
 
-- **URL**: `/criar_reserva/`
-- **Método**: `POST`
-- **Payload**:
-    ```json
-    {
-        "numero_BI": "123456789",
-        "nome_cliente": "John Doe",
-        "email_cliente": "john.doe@example.com",
-        "telefone_cliente": "1234567890",
-        "tipo_quarto": "A",
-        "check_in": "2024-06-01T14:00:00",
-        "check_out": "2024-06-05T12:00:00",
-        "status": "confirmada"
-    }
-    ```
-- **Resposta**:
-    ```json
-    {
-        "numero_BI": "123456789",
-        "nome_cliente": "John Doe",
-        "email_cliente": "john.doe@example.com",
-        "telefone_cliente": "1234567890",
-        "tipo_quarto": "A",
-        "check_in": "2024-06-01T14:00:00",
-        "check_out": "2024-06-05T12:00:00",
-        "status": "confirmada"
-    }
-    ```
+### Endpoints de Autenticação
 
-### Obter todas as reservas
+#### Registrar um novo usuário
+- URL: `/users/`
+- Método: `POST`
+- Payload:
+  ```json
+  {
+      "username": "johndoe",
+      "email": "johndoe@example.com",
+      "password": "yourpassword"
+  }
+  ```
+- Resposta:
+  ```json
+  {
+      "id": 1,
+      "username": "johndoe",
+      "email": "johndoe@example.com",
+      "is_active": true
+  }
+  ```
 
-- **URL**: `/reservas/`
-- **Método**: `GET`
-- **Resposta**:
-    ```json
-    [
-        {
-            "numero_BI": "123456789",
-            "nome_cliente": "John Doe",
-            "email_cliente": "john.doe@example.com",
-            "telefone_cliente": "1234567890",
-            "tipo_quarto": "A",
-            "check_in": "2024-06-01T14:00:00",
-            "check_out": "2024-06-05T12:00:00",
-            "status": "confirmada"
-        }
-    ]
-    ```
+#### Obter Token de Acesso
+- URL: `/token`
+- Método: `POST`
+- Payload:
+  ```json
+  {
+      "username": "johndoe",
+      "password": "yourpassword"
+  }
+  ```
+- Resposta:
+  ```json
+  {
+      "access_token": "your.jwt.token.here",
+      "token_type": "bearer"
+  }
+  ```
 
-### Cancelar uma reserva
+### Exemplos de Requisições
 
-- **URL**: `/cancelar_reserva/{numero_BI}/`
-- **Método**: `DELETE`
-- **Resposta**:
-    ```json
-    {
-        "message": "Reserva cancelada com sucesso."
-    }
-    ```
+#### Criar uma nova reserva
+- URL: `/criar_reserva/`
+- Método: `POST`
+- Payload:
+  ```json
+  {
+      "numero_BI": "123456789",
+      "nome_cliente": "John Doe",
+      "email_cliente": "john.doe@example.com",
+      "telefone_cliente": "1234567890",
+      "tipo_quarto": "A",
+      "check_in": "2024-06-01T14:00:00",
+      "check_out": "2024-06-05T12:00:00",
+      "status": "confirmada"
+  }
+  ```
+- Resposta:
+  ```json
+  {
+      "numero_BI": "123456789",
+      "nome_cliente": "John Doe",
+      "email_cliente": "john.doe@example.com",
+      "telefone_cliente": "1234567890",
+      "tipo_quarto": "A",
+      "check_in": "2024-06-01T14:00:00",
+      "check_out": "2024-06-05T12:00:00",
+      "status": "confirmada"
+  }
+  ```
 
-### Obter disponibilidade dos quartos
+#### Obter todas as reservas
+- URL: `/reservas/`
+- Método: `GET`
+- Resposta:
+  ```json
+  [
+      {
+          "numero_BI": "123456789",
+          "nome_cliente": "John Doe",
+          "email_cliente": "john.doe@example.com",
+          "telefone_cliente": "1234567890",
+          "tipo_quarto": "A",
+          "check_in": "2024-06-01T14:00:00",
+          "check_out": "2024-06-05T12:00:00",
+          "status": "confirmada"
+      }
+  ]
+  ```
 
-- **URL**: `/quartos-disponiveis/`
-- **Método**: `GET`
-- **Resposta**:
-    ```json
-    {
-        "Quartos disponíveis": {
-            "Classe A": 5,
-            "Classe B": 15,
-            "Classe C": 30
-        }
-    }
-    ```
+#### Cancelar uma reserva
+- URL: `/delete_reserva/{numero_BI}/`
+- Método: `DELETE`
+- Resposta:
+  ```json
+  {
+      "message": "Reserva cancelada com sucesso."
+  }
+  ```
 
-### Buscar uma reserva pelo número de BI
+#### Obter disponibilidade dos quartos
+- URL: `/quartos-disponiveis/`
+- Método: `GET`
+- Resposta:
+  ```json
+  {
+      "Quartos disponíveis": {
+          "Classe A": 5,
+          "Classe B": 15,
+          "Classe C": 30
+      }
+  }
+  ```
 
-- **URL**: `/buscar_reserva/{numero_BI}/`
-- **Método**: `GET`
-- **Resposta**:
-    ```json
-    {
-        "numero_BI": "123456789",
-        "nome_cliente": "John Doe",
-        "email_cliente": "john.doe@example.com",
-        "telefone_cliente": "1234567890",
-        "tipo_quarto": "A",
-        "check_in": "2024-06-01T14:00:00",
-        "check_out": "2024-06-05T12:00:00",
-        "status": "confirmada"
-    }
-    ```
+#### Buscar uma reserva pelo número de BI
+- URL: `/buscar_reserva/{numero_BI}/`
+- Método: `GET`
+- Resposta:
+  ```json
+  {
+      "numero_BI": "123456789",
+      "nome_cliente": "John Doe",
+      "email_cliente": "john.doe@example.com",
+      "telefone_cliente": "1234567890",
+      "tipo_quarto": "A",
+      "check_in": "2024-06-01T14:00:00",
+      "check_out": "2024-06-05T12:00:00",
+      "status": "confirmada"
+  }
+  ```
 
-### Atualizar uma reserva
+#### Atualizar uma reserva
+- URL: `/atualizar_reserva/{numero_BI}/`
+- Método: `PUT`
+- Payload:
+  ```json
+  {
+      "numero_BI": "123456789",
+      "nome_cliente": "John Doe",
+      "email_cliente": "john.doe@example.com",
+      "telefone_cliente": "1234567890",
+      "tipo_quarto": "A",
+      "check_in": "2024-06-01T14:00:00",
+      "check_out": "2024-06-05T12:00:00",
+      "status": "confirmada"
+  }
+  ```
+- Resposta:
+  ```json
+  {
+      "numero_BI": "123456789",
+      "nome_cliente": "John Doe",
+      "email_cliente": "john.doe@example.com",
+      "telefone_cliente": "1234567890",
+      "tipo_quarto": "A",
+      "check_in": "2024-06-01T14:00:00",
+      "check_out": "2024-06-05T12:00:00",
+      "status": "confirmada"
+  }
+  ```
 
-- **URL**: `/atualizar_reserva/{numero_BI}/`
-- **Método**: `PUT`
-- **Payload**:
-    ```json
-    {
-        "numero_BI": "123456789",
-        "nome_cliente": "John Doe",
-        "email_cliente": "john.doe@example.com",
-        "telefone_cliente": "1234567890",
-        "tipo_quarto": "A",
-        "check_in": "2024-06-01T14:00:00",
-        "check_out": "2024-06-05T12:00:00",
-        "status": "confirmada"
-    }
-    ```
-- **Resposta**:
-    ```json
-    {
-        "numero_BI": "123456789",
-        "nome_cliente": "John Doe",
-        "email_cliente": "john.doe@example.com",
-        "telefone_cliente": "1234567890",
-        "tipo_quarto": "A",
-        "check_in": "2024-06-01T14:00:00",
-        "check_out": "2024-06-05T12:00:00",
-        "status": "confirmada"
-    }
+## Diagramas
 
 ### Diagrama de Entidade Relacionamento
 
@@ -170,7 +213,7 @@ Este é uma API para gestão de reservas de hotel, desenvolvida utilizando o fra
 - [x] Definir uma quantidade limitada de quartos e categorias;
 - [x] Criar Diagramas Explicando o Codigo;
 - [ ] Adicionar preco de Quartos;
-- [ ] Criar no server um metodo de autenticacao;
+- [x] Criar no server um metodo de autenticacao;
 - [ ] Sistema de pagamento(strike);
 - [ ] Verificar entradas;
 - [ ] Gerar ficheiro de Logs
