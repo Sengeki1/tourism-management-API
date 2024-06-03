@@ -104,6 +104,7 @@ app.post('/transaction', (req, res) => {
         if (key === "reservationChoice" && req.body[key] === "Hotel") {
             let status = req.body.status = "ativa"
             post_data = {
+                numero_BU: req.body.BI,
                 nome_cliente: req.body.name,
                 email_cliente: req.body.email,
                 telefone_cliente: req.body.phone_number,
@@ -115,16 +116,7 @@ app.post('/transaction', (req, res) => {
             const options1 = {
                 host: "0.0.0.0",
                 port: "8000",
-                path: "/reserva/",
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json' 
-                }
-            }
-            const options2 = {
-                host: "0.0.0.0",
-                port: "8000",
-                path: "/reservas/",
+                path: "/criar_reserva/",
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json' 
@@ -153,30 +145,7 @@ app.post('/transaction', (req, res) => {
             }
             
             try {
-                const statusCoder = await makeRequestReservas(); // Await the completion of makeRequestReservas
-                if (statusCoder === 200) {
-                    const post_req = http.request(options2, (response) => {
-                        console.log(`Status code Reservas: ${response.statusCode}`);
-            
-                        let responseData = '';
-                        response.on('data', (data) => { // listen on data
-                            responseData += data;
-                        });
-            
-                        response.on('end', () => {
-                            if (response.statusCode === 200) {
-                                res.send(responseData);
-                            }
-                        });
-                    });
-            
-                    post_req.on('error', (error) => { // in case of an error
-                        console.log(`Error sending request: ${error.message}`);
-                    });
-            
-                    post_req.write(postData);
-                    post_req.end();
-                }
+                await makeRequestReservas(); // Await the completion of makeRequestReservas
             } catch (error) {
                 console.log(`Error in request: ${error.message}`);
             }
@@ -227,12 +196,77 @@ app.get('/reservateroom', (req, res) => {
     get_req.end() // End the request to the other server
 })
 
+app.post('/delete_reserva', (req, res) => {
+    const options = {
+        host: "0.0.0.0",
+        port: "8000",
+        path: `/delete_reserva/${req.body.BI}/`,
+        method: "DELETE"
+    }
+    // get a HTTP DELETE request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.end() // End the request to the other server
+})
+
 app.get('/showReservation', (req, res) => {
     const options = {
         host: "0.0.0.0",
         port: "8000",
         path: "/reservas/",
         method: "GET",
+    }
+
+    // get a HTTP GET request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.end() // End the request to the other server
+})
+
+app.post('/searchReservation', (req, res) => {
+    const options = {
+        host: "0.0.0.0",
+        port: "8000",
+        path: `/buscar_reserva/${req.body.BI}/`,
+        method: "GET",
+    }
+
+    // get a HTTP GET request from Database Server 
+    const get_req = http.request(options, (response) => {
+        console.log(`\nStatus code: ${response.statusCode}`)
+
+        response.on('data', (data) => { // collect the data from the response
+            res.send(data)
+        })
+    })
+    get_req.on('error', (error) => {
+        console.log(`Error making HTTP request to other server: ${error.message}`)
+    })
+    get_req.end() // End the request to the other server
+})
+
+app.post('/updateReservation', (req, res) => {
+    const options = {
+        host: "0.0.0.0",
+        port: "8000",
+        path: `/atualizar_reserva/${req.body.BI}/`,
+        method: "PUT",
     }
 
     // get a HTTP GET request from Database Server 
