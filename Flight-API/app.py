@@ -1,6 +1,6 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
 import sqlite3
-from datetime import datetime
+from datetime import datetime, timedelta
 from threading import Lock
 import jwt
 import baseDeDados as BD  # Importe o módulo baseDeDados.py
@@ -48,7 +48,7 @@ def token_required(f):
 # Rota para registrar usuário
 @app.route('/registrar_form')
 def registrar_form():
-    return render_template('registrar.html')
+    return jsonify({'mensagem': 'Formulário de registro disponível'}), 200
 
 # Rota para registrar usuário
 @app.route('/registrar', methods=['POST'])
@@ -73,7 +73,7 @@ def registrar():
 # Rota para login
 @app.route('/login_form')
 def login_form():
-    return render_template('login.html')
+    return jsonify({'mensagem': 'Formulário de login disponível'}), 200
 
 # Rota para login
 @app.route('/login', methods=['POST'])
@@ -91,7 +91,7 @@ def login():
     if not user or not check_password_hash(user['senha'], senha):
         return jsonify({'mensagem': 'Login ou senha incorretos!'}), 401
 
-    token = jwt.encode({'id': user['id'], 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)}, app.config['SECRET_KEY'], algorithm="HS256")
+    token = jwt.encode({'id': user['id'], 'exp': datetime.utcnow() + timedelta(hours=1)}, app.config['SECRET_KEY'], algorithm="HS256")
     return jsonify({'token': token})
 
 # Rota para listar passageiros
@@ -102,7 +102,8 @@ def listar_passageiros():
     cursor.execute('''SELECT * FROM Passageiros''')
     passageiros = cursor.fetchall()
     conn.close()
-    return render_template('passageiros.html', passageiros=passageiros)
+    passageiros_list = [dict(passageiro) for passageiro in passageiros]
+    return jsonify(passageiros_list), 200
 
 # Rota para listar voos disponíveis
 @app.route('/listar_voos_disponiveis')
@@ -112,12 +113,13 @@ def listar_voos_disponiveis():
     cursor.execute('''SELECT * FROM Voos WHERE vagas > 0''')
     voos = cursor.fetchall()
     conn.close()
-    return render_template('voos_disponiveis.html', voos=voos)
+    voos_list = [dict(voo) for voo in voos]
+    return jsonify(voos_list), 200
 
 # Rota para adicionar passageiro (renderiza o formulário)
 @app.route('/adicionar_passageiro_form')
 def adicionar_passageiro_form():
-    return render_template('adicionar_passageiro.html')
+    return jsonify({'mensagem': 'Formulário de adição de passageiro disponível'}), 200
 
 # Rota para adicionar passageiro (processa os dados)
 @app.route('/adicionar_passageiro', methods=['POST'])
@@ -153,7 +155,7 @@ def adicionar_passageiro():
 # Rota para reservar um voo (renderiza o formulário)
 @app.route('/reservar_voo_form')
 def reservar_voo_form():
-    return render_template('reservar_voo.html')
+    return jsonify({'mensagem': 'Formulário de reserva de voo disponível'}), 200
 
 # Rota para reservar um voo (processa os dados)
 @app.route('/reservar_voo', methods=['POST'])
@@ -208,21 +210,13 @@ def voos_reservados():
                       INNER JOIN Reservas ON Voos.id = Reservas.voo_id''')
     voos = cursor.fetchall()
     conn.close()
-    voos_reservados = []
-    for voo in voos:
-        voos_reservados.append({
-            'id': voo['id'],
-            'origem': voo['origem'],
-            'destino': voo['destino'],
-            'data': voo['data'],
-            'hora_partida': voo['hora_partida']
-        })
-    return jsonify(voos_reservados)
+    voos_reservados = [dict(voo) for voo in voos]
+    return jsonify(voos_reservados), 200
 
 # Rota para renderizar a página HTML de voos reservados
 @app.route('/voos_reservados_pagina')
 def voos_reservados_pagina():
-    return render_template('voos_reservados.html')
+    return jsonify({'mensagem': 'Página de voos reservados disponível'}), 200
 
 # Rota para listar as reservas do usuário
 @app.route('/minhas_reservas', methods=['GET'])
@@ -236,13 +230,14 @@ def minhas_reservas(current_user):
                       WHERE R.passageiro_id = ?''', (current_user['id'],))
     reservas = cursor.fetchall()
     conn.close()
-    return render_template('minhas_reservas.html', reservas=reservas)
+    reservas_list = [dict(reserva) for reserva in reservas]
+    return jsonify(reservas_list), 200
 
 # Rota para renderizar a página HTML de reservas do usuário
 @app.route('/minhas_reservas_pagina')
 @token_required
 def minhas_reservas_pagina(current_user):
-    return render_template('minhas_reservas.html')
+    return jsonify({'mensagem': 'Página de reservas do usuário disponível'}), 200
 
 
 if __name__ == '__main__':

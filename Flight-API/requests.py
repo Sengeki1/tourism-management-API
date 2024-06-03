@@ -8,7 +8,9 @@ data = {
     'nome': 'Maria',
     'sobrenome': 'Silva',
     'email': 'maria@example.com',
-    'telefone': '9784567'
+    'telefone': '9784567',
+    'bi': '20020610Z1OOY',
+    'passaporte': '20020610Z1OOY'
 }
 
 # Fazendo a requisição POST
