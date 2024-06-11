@@ -1,11 +1,11 @@
 from flask import Flask, request, jsonify
 import sqlite3
 from datetime import datetime, timedelta
-from threading import Lock
 import jwt
-import baseDeDados as BD  # Importe o módulo baseDeDados.py
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import threading
+import random
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'your_secret_key'  # Change this to a random secret key
@@ -17,10 +17,11 @@ def conectar_bd():
     return conn
 
 # Chamando a função de criação de tabelas de baseDeDados.py para garantir que as tabelas sejam criadas antes de acessá-las
+import baseDeDados as BD  # Importe o módulo baseDeDados.py
 BD.criar_tabelas()
 
 # Lock para gerenciar concorrência
-lock = Lock()
+lock = threading.Lock()
 
 # Decorator para verificar o token
 def token_required(f):
@@ -44,6 +45,32 @@ def token_required(f):
         
         return f(current_user, *args, **kwargs)
     return decorated
+
+# Função para adicionar um passageiro dentro de uma transação
+def adicionar_passageiro_com_transacao(passageiro_data):
+    conn = conectar_bd()
+    cursor = conn.cursor()
+    try:
+        # Inicia a transação
+        cursor.execute("BEGIN TRANSACTION")
+
+        # Adiciona o passageiro
+        cursor.execute('''
+            INSERT INTO Passageiros (nome, sobrenome, email, telefone, bi, passaporte)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (passageiro_data['nome'], passageiro_data['sobrenome'], 
+              passageiro_data['email'], passageiro_data['telefone'],
+              passageiro_data['bi'], passageiro_data['passaporte']))
+
+        # Confirma a transação
+        conn.commit()
+        print("Passageiro adicionado com sucesso!")
+    except sqlite3.Error as e:
+        # Desfaz a transação em caso de erro
+        conn.rollback()
+        print(f"Erro ao adicionar passageiro: {e}")
+    finally:
+        conn.close()
 
 # Rota para registrar usuário
 @app.route('/registrar_form')
@@ -116,12 +143,7 @@ def listar_voos_disponiveis():
     voos_list = [dict(voo) for voo in voos]
     return jsonify(voos_list), 200
 
-# Rota para adicionar passageiro (renderiza o formulário)
-@app.route('/adicionar_passageiro_form')
-def adicionar_passageiro_form():
-    return jsonify({'mensagem': 'Formulário de adição de passageiro disponível'}), 200
-
-# Rota para adicionar passageiro (processa os dados)
+# Rota para adicionar passageiro
 @app.route('/adicionar_passageiro', methods=['POST'])
 def adicionar_passageiro():
     try:
@@ -136,21 +158,12 @@ def adicionar_passageiro():
         if not nome or not sobrenome or not email or not bi or not passaporte:
             return jsonify({'mensagem': 'Nome, sobrenome, email, BI e passaporte são obrigatórios'}), 400
 
-        conn = conectar_bd()
-        cursor = conn.cursor()
-
-        cursor.execute('''
-            INSERT INTO Passageiros (nome, sobrenome, email, telefone, bi, passaporte)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (nome, sobrenome, email, telefone, bi, passaporte))
-        conn.commit()
-        return jsonify({'mensagem': 'Passageiro adicionado com sucesso'}), 200
+        adicionar_passageiro_com_transacao(data)
+        return jsonify({'mensagem': 'Passageiro adicionado com sucesso!'}), 200
     except sqlite3.IntegrityError as e:
         return jsonify({'mensagem': f'Erro ao adicionar passageiro: {str(e)}'}), 400
     except Exception as e:
         return jsonify({'mensagem': f'Erro ao adicionar passageiro: {str(e)}'}), 500
-    finally:
-        conn.close()
 
 # Rota para reservar um voo (renderiza o formulário)
 @app.route('/reservar_voo_form')
@@ -173,6 +186,9 @@ def reservar_voo(current_user):
             conn = conectar_bd()
             cursor = conn.cursor()
 
+            # Inicia a transação
+            cursor.execute("BEGIN TRANSACTION")
+
             # Verificar se há vagas disponíveis
             cursor.execute('SELECT vagas FROM Voos WHERE id = ?', (voo_id,))
             voo = cursor.fetchone()
@@ -190,10 +206,14 @@ def reservar_voo(current_user):
 
             # Atualizar o número de vagas disponíveis
             cursor.execute('UPDATE Voos SET vagas = vagas - 1 WHERE id = ?', (voo_id,))
+
+            # Confirma a transação
             conn.commit()
 
             return jsonify({'mensagem': 'Reserva realizada com sucesso'}), 200
     except sqlite3.IntegrityError as e:
+        # Desfaz a transação em caso de erro
+        conn.rollback()
         return jsonify({'mensagem': f'Erro ao realizar reserva: {str(e)}'}), 400
     except Exception as e:
         return jsonify({'mensagem': f'Erro ao realizar reserva: {str(e)}'}), 500
@@ -239,6 +259,18 @@ def minhas_reservas(current_user):
 def minhas_reservas_pagina(current_user):
     return jsonify({'mensagem': 'Página de reservas do usuário disponível'}), 200
 
+@app.route("/sistema_pagamento", methods=["POST"])
+def sistema_pagamento():
+    dados_pagamento = request.get_json()
+    valor = dados_pagamento["valor"]
+    descricao = dados_pagamento["descricao"]
+
+    # Simula o processamento do pagamento
+    if random.random() < 0.9:  # 90% de chance de sucesso
+        return jsonify({"mensagem": "Pagamento com sucesso", "valor": valor, "descricao": descricao}), 200
+    else:
+        return jsonify({"mensagem": "Falha no pagamento"}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
+
