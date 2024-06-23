@@ -8,9 +8,9 @@ import http from 'http'
 const clientData = {card: {}}
 const loginData = {}
 const registerData = {}
-let loginState;
-let statusCode
-
+let loginState
+let mensagemLogin = "";
+let statusCode = 0
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)) // timer 2s
 
@@ -127,6 +127,7 @@ async function validateOperation() {
 
         let responseData = ""
         const post_req = http.request(options, (res) => {
+            statusCode = res.statusCode
             
             res.on('data', (chunk) => {
                 responseData += chunk
@@ -134,7 +135,6 @@ async function validateOperation() {
             res.on('end', () => {
                 const data = JSON.parse(responseData) // receive JSON file and convert it to an object
                 mensagemLogin = data.message
-                statusCode = data.statusCode
             })
         })
         post_req.on('error', (error) => {
@@ -159,14 +159,16 @@ async function validateOperation() {
 
         let responseData = ""
         const post_req = http.request(options, (res) => {
+            statusCode = res.statusCode;
             
             res.on('data', (chunk) => {
                 responseData += chunk
             })
             res.on('end', () => {
                 const data = JSON.parse(responseData) // receive JSON file and convert it to an object
+                console.log("response", responseData)
+                console.log(data)
                 mensagemLogin = data.message
-                statusCode = data.statusCode
             })
         })
         post_req.on('error', (error) => {
@@ -178,7 +180,6 @@ async function validateOperation() {
 }
 
 await validateOperation()
-
 if (statusCode === 200) {
 
     if (clientData.reservationChoice === "Hotel") {

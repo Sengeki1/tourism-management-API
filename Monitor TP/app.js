@@ -309,79 +309,134 @@ app.get('/showReservationtravel', (req, res) => {
 })
 
 app.post('/login', (req, res) => {
-    Object.keys(req.body).forEach(async key => {
+    console.log(req.body);
+
+    let isValid = true;
+    let errorResponse = {};
+
+    Object.keys(req.body).forEach(key => {
         if (typeof req.body[key] === "string" && req.body[key].trim() === "") {
-            res.statusCode = 406 //Not Acceptable
-            return res.json({"text": "missing fields"})
+            isValid = false;
+            errorResponse = { "text": "missing fields" };
         }
         if (key === "username") {
-            var hasNumber = /\d/
-            if(hasNumber.test(req.body[key])) { // retorna true se o nome conter numeros
-                res.statusCode = 406
-                return res.json({"text": "error: invalid name"})
+            var hasNumber = /\d/;
+            if (hasNumber.test(req.body[key])) { // returns true if the name contains numbers
+                isValid = false;
+                errorResponse = { "text": "error: invalid name" };
             }
         }
-        if (key === "reservationChoice" && req.body[key] === "Hotel") {
-            const post_data = {
-                username: req.body.username,
-                password: req.body.password
-            }
-            const options = {
-                host: "0.0.0.0",
-                port: "8000",
-                path: "/token",
-                method: "POST",
-            }
-            
-            const postData = `${JSON.stringify(post_data)}`
-            // get a HTTP POST request from Database Server 
-            const get_req = http.request(options, (response) => {
-                console.log(`\nStatus code: ${response.statusCode}`)
+    });
 
-                response.on('data', (data) => { // collect the data from the response
-                    res.send(data)
-                })
-            })
-            get_req.on('error', (error) => {
-                console.log(`Error making HTTP request to other server: ${error.message}`)
-            })
-            get_req.write(postData)
-            get_req.end() // End the request to the other server
-        } else if (key === "reservationChoice" && req.body[key] != "Hotel") {
-            const post_data = {
-                username: req.body.username,
-                password: req.body.password
-            }
-            const options = {
-                host: "127.0.0.1",
-                port: "5000",
-                path: "/login",
-                method: "POST",
-            }
-            
-            const postData = `${JSON.stringify(post_data)}`
-            // get a HTTP POST request from Database Server 
-            const get_req = http.request(options, (response) => {
-                console.log(`\nStatus code: ${response.statusCode}`)
+    if (!isValid) {
+        return res.status(406).json(errorResponse);
+    }
 
-                response.on('data', (data) => { // collect the data from the response
-                    res.send(data)
-                })
-            })
-            get_req.on('error', (error) => {
-                console.log(`Error making HTTP request to other server: ${error.message}`)
-            })
-            get_req.write(postData)
-            get_req.end() // End the request to the other server
-        }
-    })
-})
+    const post_data = {
+        username: req.body.username,
+        password: req.body.password
+    };
+    const postData = JSON.stringify(post_data);
+
+    if (req.body.reservationChoice === "Hotel") {
+        const options = {
+            host: "0.0.0.0",
+            port: "8000",
+            path: "/token",
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        const get_req = http.request(options, (response) => {
+            let data = '';
+
+            response.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            response.on('end', () => {
+                res.send(200).json({data: data,
+                    statusCode: 200
+                });
+            });
+        });
+
+        get_req.on('error', (error) => {
+            console.log(`Error making HTTP request to other server: ${error.message}`);
+            res.status(500).send('Internal server error');
+        });
+
+        get_req.write(postData);
+        get_req.end();
+
+    } else if (req.body.reservationChoice !== "Hotel") {
+        const options = {
+            host: "127.0.0.1",
+            port: "5000",
+            path: "/login",
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'Content-Length': Buffer.byteLength(postData)
+            }
+        };
+
+        const get_req = http.request(options, (response) => {
+            let data = '';
+
+            response.on('data', (chunk) => {
+                data += chunk;
+            });
+
+            response.on('end', () => {
+                res.send(200).json({data: data,
+                    statusCode: 200
+                });
+            });
+        });
+
+        get_req.on('error', (error) => {
+            console.log(`Error making HTTP request to other server: ${error.message}`);
+            res.status(500).send('Internal server error');
+        });
+
+        get_req.write(postData);
+        get_req.end();
+    }
+});
 
 app.post('/register', async (req, res) => {
-    if (!req.body.username || !req.body.password  || !req.body.email ) {
-        res.status(406).send("error: invalid format");
-        return;
+    console.log(req.body)
+    let isValid = true;
+    let errorResponse = {};
+
+    Object.keys(req.body).forEach(key => {
+        if (typeof req.body[key] === "string" && req.body[key].trim() === "") {
+            isValid = false;
+            errorResponse = { "text": "missing fields" };
+        }
+        if (key === "name") {
+            var hasNumber = /\d/;
+            if (hasNumber.test(req.body[key])) { // returns true if the name contains numbers
+                isValid = false;
+                errorResponse = { "text": "error: invalid name" };
+            }
+        }
+        if (key === "email") {
+            if (!validator.validate(req.body[key])) {
+                isValid = false;
+                errorResponse = { "text": "error: invalid email" };
+            }
+        }
+    });
+
+    if (!isValid) {
+        return res.status(406).json(errorResponse);
     }
+
     const post_data = {
         username: req.body.username,
         email: req.body.email,
@@ -411,19 +466,23 @@ app.post('/register', async (req, res) => {
     };
 
     try {
-        // Primeira requisição para a API de voos
         const responseFlight = await makeRequest(optionsFlight, postData);
         console.log(`Status code Flight: ${responseFlight.statusCode}`);
+        const flightData = JSON.parse(responseFlight.data);
 
-        // Segunda requisição para a API de hotéis
         const responseHotel = await makeRequest(optionsHotel, postData);
         console.log(`Status code Hotel: ${responseHotel.statusCode}`);
+        const hotelData = JSON.parse(responseHotel.data);
 
-        res.status(200).send("User registered successfully in both systems");
+        res.status(200).json({
+            message: "User registered successfully in both systems",
+            flightToken: flightData.access_token,
+            hotelToken: hotelData.access_token,
+            statusCode: 200
+        });
     } catch (error) {
         console.log(`Error during registration: ${error.message}`);
 
-        // Tentativa de rollback em caso de falha
         await rollbackRequest(optionsFlight, post_data.username);
         await rollbackRequest(optionsHotel, post_data.username);
         
