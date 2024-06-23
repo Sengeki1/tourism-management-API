@@ -310,11 +310,18 @@ app.get('/showReservationtravel', (req, res) => {
 
 app.post('/login', (req, res) => {
     Object.keys(req.body).forEach(async key => {
-        if (key === "reservationChoice" && req.body[key] === "Hotel") {
-            if (!req.body.username || !req.body.password) {
+        if (typeof req.body[key] === "string" && req.body[key].trim() === "") {
+            res.statusCode = 406 //Not Acceptable
+            return res.json({"text": "missing fields"})
+        }
+        if (key === "username") {
+            var hasNumber = /\d/
+            if(hasNumber.test(req.body[key])) { // retorna true se o nome conter numeros
                 res.statusCode = 406
-                return res.send("error: invalid format")
+                return res.json({"text": "error: invalid name"})
             }
+        }
+        if (key === "reservationChoice" && req.body[key] === "Hotel") {
             const post_data = {
                 username: req.body.username,
                 senha: req.body.senha
