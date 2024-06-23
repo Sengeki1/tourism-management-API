@@ -92,7 +92,7 @@ def login():
         return jsonify({'mensagem': 'Login ou senha incorretos!'}), 401
 
     token = jwt.encode({'id': user['id'], 'exp': datetime.utcnow() + timedelta(hours=1)}, app.config['SECRET_KEY'], algorithm="HS256")
-    return jsonify({'token': token})
+    return jsonify({'token': token}), 200
 
 # Rota para listar passageiros
 @app.route('/listar_passageiros')

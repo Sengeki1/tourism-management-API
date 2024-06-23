@@ -311,7 +311,7 @@ app.get('/showReservationtravel', (req, res) => {
 app.post('/login', (req, res) => {
     const post_data = {
         username: req.body.username,
-        senha: req.body.senha
+        senha: req.body.password
     }
     const options = {
         host: "127.0.0.1",
