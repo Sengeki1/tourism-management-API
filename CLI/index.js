@@ -9,8 +9,8 @@ const clientData = {card: {}}
 const loginData = {}
 const registerData = {}
 let loginState;
-let mensagemLogin, statusCode
-let val;
+let statusCode
+
 
 const sleep = (ms = 2000) => new Promise((r) => setTimeout(r, ms)) // timer 2s
 
@@ -37,6 +37,7 @@ async function login() {
 
     loginData.username = username.username
     loginData.password = password.password
+    loginData.reservationChoice = clientData.reservationChoice
 }
 
 async function register() {
@@ -45,6 +46,11 @@ async function register() {
         type: 'input',
         message: 'username:'
     })
+    const email = await inquirer.prompt({
+        name: 'email',
+        type: 'input',
+        message: 'email:'
+    })
     const password = await inquirer.prompt({
         name: 'password',
         type: 'input',
@@ -52,6 +58,7 @@ async function register() {
     })
 
     registerData.username = username.username
+    registerData.email = email.email
     registerData.password = password.password
 }
 
@@ -135,31 +142,44 @@ async function validateOperation() {
         })
         post_req.write(postData)
         post_req.end()
+        
     } else {
         await register()
+        const postData = `${JSON.stringify(registerData)}`
+
+        const options = {
+            host: "127.0.0.1",
+            port: "3001",
+            path: "/register",
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+
+        let responseData = ""
+        const post_req = http.request(options, (res) => {
+            
+            res.on('data', (chunk) => {
+                responseData += chunk
+            })
+            res.on('end', () => {
+                const data = JSON.parse(responseData) // receive JSON file and convert it to an object
+                mensagemLogin = data.message
+                statusCode = data.statusCode
+            })
+        })
+        post_req.on('error', (error) => {
+            console.log(`Error making request: ${error.message}`);
+        })
+        post_req.write(postData)
+        post_req.end()
     }
 }
 
 await validateOperation()
 
-if (statusCode === 401){
-    async function retryOperation() {
-
-        const choice = await inquirer.prompt({
-            name: 'operation',
-            type: 'list',
-            message: 'Operation:',
-            choices: [
-                "Retry",
-                "Exit"
-            ]
-        })
-
-        val = choice.operation
-    }
-    if (val === "Retry") await validateOperation()
-
-} else if (statusCode === 200) {
+if (statusCode === 200) {
 
     if (clientData.reservationChoice === "Hotel") {
 

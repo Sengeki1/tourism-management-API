@@ -1,0 +1,7 @@
+Address(host='127.0.0.1', port=54133) - ['POST /users/'] - 422 - [Hora:17:13:14] - [Tempo:'0.002's]
+Address(host='127.0.0.1', port=54133) - ['DELETE /users/Marco/'] - 404 - [Hora:17:13:14] - [Tempo:'0.000's]
+Address(host='127.0.0.1', port=54185) - ['POST /users/'] - 200 - [Hora:17:24:40] - [Tempo:'0.294's]
+Address(host='127.0.0.1', port=54449) - ['POST /users/'] - 200 - [Hora:18:09:27] - [Tempo:'0.295's]
+Address(host='127.0.0.1', port=54518) - ['POST /users/'] - 200 - [Hora:18:29:17] - [Tempo:'0.267's]
+Address(host='127.0.0.1', port=54531) - ['POST /users/'] - 200 - [Hora:18:33:24] - [Tempo:'0.266's]
+Address(host='127.0.0.1', port=54631) - ['POST /users/'] - 200 - [Hora:18:49:20] - [Tempo:'0.295's]

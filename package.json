@@ -10,15 +10,15 @@
     "http": "^0.0.1-security",
     "inquirer": "^9.2.20",
     "nanospinner": "^1.1.0",
-    "nodemon": "^3.1.0",
+    "nodemon": "^3.1.4",
     "phone": "^3.1.43",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "tough-cookie": "^4.1.4"
   },
   "name": "tourism-management-api",
   "version": "1.0.0",
   "description": "A small tourism management system",
   "main": "index.js",
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -82,8 +82,8 @@ def registrar_form():
 def registrar():
     data = request.get_json()
     username = data['username']
-    senha = data['senha']
-    hashed_password = generate_password_hash(senha, method='sha256')
+    senha = data['password']
+    hashed_password = generate_password_hash(senha, method='pbkdf2:sha256')
 
     conn = conectar_bd()
     cursor = conn.cursor()
@@ -107,7 +107,7 @@ def login_form():
 def login():
     data = request.get_json()
     username = data['username']
-    senha = data['senha']
+    senha = data['password']
 
     conn = conectar_bd()
     cursor = conn.cursor()
