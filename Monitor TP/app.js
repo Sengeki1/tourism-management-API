@@ -324,7 +324,7 @@ app.post('/login', (req, res) => {
         if (key === "reservationChoice" && req.body[key] === "Hotel") {
             const post_data = {
                 username: req.body.username,
-                senha: req.body.senha
+                password: req.body.password
             }
             const options = {
                 host: "0.0.0.0",
@@ -347,14 +347,10 @@ app.post('/login', (req, res) => {
             })
             get_req.write(postData)
             get_req.end() // End the request to the other server
-        } else {
-            if (!req.body.username || !req.body.password) {
-                res.statusCode = 406
-                return res.send("error: invalid format")
-            }
+        } else if (key === "reservationChoice" && req.body[key] != "Hotel") {
             const post_data = {
                 username: req.body.username,
-                senha: req.body.senha
+                password: req.body.password
             }
             const options = {
                 host: "127.0.0.1",
@@ -428,11 +424,9 @@ app.post('/register', async (req, res) => {
         console.log(`Error during registration: ${error.message}`);
 
         // Tentativa de rollback em caso de falha
-        if (error.api === 'flight') {
-            await rollbackRequest(optionsFlight, post_data.username);
-        } else if (error.api === 'hotel') {
-            await rollbackRequest(optionsHotel, post_data.username);
-        }
+        await rollbackRequest(optionsFlight, post_data.username);
+        await rollbackRequest(optionsHotel, post_data.username);
+        
         res.status(500).send("Error: registration failed and rollback performed");
     }
 });
